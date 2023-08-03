@@ -6,9 +6,7 @@ class Main {
 }
 
 fun main() {
-
     LegisAuthenticator().authenticate()
-
 }
 
 class LegisAuthenticator : Authenticator {
