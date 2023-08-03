@@ -7,6 +7,7 @@
         <module>authentication</module>
         <module>legis</module>
         <module>ui</module>
+        <module>model</module>
     </modules>
 
     <groupId>br.com.jusapi</groupId>
