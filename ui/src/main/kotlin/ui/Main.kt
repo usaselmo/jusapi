@@ -1,4 +1,4 @@
-package legis
+package ui
 
 import authentication.api.Authenticator
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,7 +10,8 @@ import org.springframework.context.annotation.ComponentScan
 @SpringBootApplication
 @ComponentScan(value = [
     "legis",
-    "authentication"
+    "authentication",
+    "ui"
 ])
 class Main : CommandLineRunner {
 
