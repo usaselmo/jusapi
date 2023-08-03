@@ -7,7 +7,9 @@ import authentication.api.UserId
 import authentication.domain.EventPublisher
 import authentication.domain.model.User
 import authentication.domain.vo.Access
+import org.springframework.stereotype.Component
 
+@Component
 class ApplicationAuthenticator(
     private val eventPublisher: EventPublisher,
 ) : Authenticator {
