@@ -1,11 +1,15 @@
 package legis
 
 import authentication.api.Authenticator
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
 
+@SpringBootApplication
 class Main {
 }
 
-fun main() {
+fun main(args: Array<String>) {
+    runApplication<Main>(*args)
     LegisAuthenticator().authenticate()
 }
 
