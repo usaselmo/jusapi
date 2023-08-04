@@ -1,4 +1,4 @@
-package authentication.api
+package authentication
 
 data class Authentication(
     val isAuthenticated: Boolean,

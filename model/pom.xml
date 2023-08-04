@@ -5,13 +5,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>jusapi</artifactId>
+        <artifactId>root-app</artifactId>
         <groupId>br.com.jusapi</groupId>
         <version>1.0.0</version>
     </parent>
 
-    <name>MODEL ---------- MODULE</name>
+    <version>0.0.1</version>
     <artifactId>model</artifactId>
-    <version>1.0.0</version>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
 </project>

@@ -1,15 +1,13 @@
 package authentication.app
 
-import authentication.api.Email
-import authentication.api.UserId
 import authentication.domain.EventPublisher
 import authentication.domain.model.*
 import authentication.domain.vo.Name
-import org.springframework.stereotype.Component
+import model.Email
+import model.UserId
 import java.time.LocalDateTime
 import java.util.*
 
-@Component
 class Factory(
     private val eventPublisher: EventPublisher,
 ) {

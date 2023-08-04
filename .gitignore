@@ -1,5 +1,4 @@
-/.idea/
-/legis/target/
 /authentication/target/
-/ui/target/
+/.idea/
 /model/target/
+/ui/target/

@@ -1,8 +1,8 @@
 package authentication.domain.model
 
-import authentication.api.Email
-import authentication.api.UserId
 import authentication.domain.vo.Name
+import model.Email
+import model.UserId
 import java.time.LocalDateTime
 
 data class User(

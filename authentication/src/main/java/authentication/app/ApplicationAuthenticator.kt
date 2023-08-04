@@ -1,15 +1,13 @@
 package authentication.app
 
-import authentication.api.Authentication
-import authentication.api.Authenticator
-import authentication.api.Email
-import authentication.api.UserId
+import authentication.Authentication
+import authentication.Authenticator
 import authentication.domain.EventPublisher
 import authentication.domain.model.User
 import authentication.domain.vo.Access
-import org.springframework.stereotype.Component
+import model.Email
+import model.UserId
 
-@Component
 class ApplicationAuthenticator(
     private val eventPublisher: EventPublisher,
 ) : Authenticator {
@@ -30,8 +28,12 @@ class ApplicationAuthenticator(
         return Authentication(true) //        TODO("Not yet implemented")
     }
 
-    override fun authenticate() {
+    fun authenticate() {
         println("This is authenticator ....") //TODO("Not yet implemented")
+    }
+
+    override fun authenticate(email: Email) {
+        println("This is authenticate method in ApplicationAuthenticator")
     }
 
 }
