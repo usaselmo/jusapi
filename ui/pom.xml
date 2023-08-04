@@ -25,8 +25,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
-
-        <!--OAUTH2-->
+        <!-- SPRING - OAUTH2 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
@@ -38,6 +37,7 @@
             <artifactId>authentication</artifactId>
             <version>1.0.0</version>
         </dependency>
+
     </dependencies>
 
 </project>
