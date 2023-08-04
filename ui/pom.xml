@@ -26,6 +26,7 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
+        <!--JUSAPI - AUTHENTICATION-->
         <dependency>
             <groupId>br.com.jusapi</groupId>
             <artifactId>authentication</artifactId>

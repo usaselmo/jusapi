@@ -2,13 +2,16 @@ package ui
 
 import authentication.Authenticator
 import model.Email
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
 
-class Main {
-}
+@SpringBootApplication
+class Main
 
 
-fun main() {
+fun main(args: Array<String>) {
     UiAuthenticator().authenticate(Email("serse"))
+    runApplication<Main>(*args)
 }
 
 class UiAuthenticator : Authenticator {
