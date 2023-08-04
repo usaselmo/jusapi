@@ -1,4 +1,4 @@
-package authentication
+package authentication.api
 
 import model.Email
 

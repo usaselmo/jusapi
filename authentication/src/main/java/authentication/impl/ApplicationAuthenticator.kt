@@ -1,13 +1,16 @@
-package authentication.app
+package authentication.impl
 
 import authentication.Authentication
-import authentication.Authenticator
+import authentication.api.Authenticator
+import authentication.app.UserAccessRegisteredDomainEvent
 import authentication.domain.EventPublisher
 import authentication.domain.model.User
 import authentication.domain.vo.Access
 import model.Email
 import model.UserId
+import org.springframework.stereotype.Component
 
+@Component
 class ApplicationAuthenticator(
     private val eventPublisher: EventPublisher,
 ) : Authenticator {
