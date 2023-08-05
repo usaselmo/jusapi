@@ -1,42 +1,49 @@
 package authentication.impl
 
-import authentication.Authentication
+import authentication.api.Authentication
+import authentication.api.Authentication.Companion.failed
 import authentication.api.Authenticator
-import authentication.app.UserAccessRegisteredDomainEvent
-import authentication.domain.EventPublisher
-import authentication.domain.model.User
-import authentication.domain.vo.Access
-import model.Email
-import model.UserId
+import authentication.domain.Messages.USUARIO_CONTA_BLOQUEADA
+import authentication.domain.Messages.USUARIO_CONTA_DELETADA
+import authentication.domain.Messages.USUARIO_DELETADO
+import authentication.domain.Messages.USUARIO_NAO_TEM_CREDITOS
+import authentication.domain.Publisher
+import authentication.domain.UserAccessRegisteredDomainEvent
+import authentication.domain.repository.UserRepository
+import model.*
 import org.springframework.stereotype.Component
 
 @Component
 class ApplicationAuthenticator(
-    private val eventPublisher: EventPublisher,
+    private val publisher: Publisher,
+    private val userRepository: UserRepository,
 ) : Authenticator {
 
     fun registerUserAccess(user: User, access: Access): User {
         return user.incrementAccessCount().also {
-            eventPublisher.publish(
+            publisher.publish(
                 UserAccessRegisteredDomainEvent(user = user, access = access)
             )
         }
     }
 
-    fun authenticate(userId: UserId, password: String): Authentication {
-        return Authentication(true) //        TODO("Not yet implemented")
+    override fun authenticate(userId: UserId, password: Password): Authentication {
+        return Authentication(
+            isAuthenticated = true,
+            errorMessages = listOf()
+        )
     }
 
-    fun authenticate(email: Email, password: String): Authentication {
-        return Authentication(true) //        TODO("Not yet implemented")
-    }
-
-    fun authenticate() {
-        println("This is authenticator ....") //TODO("Not yet implemented")
-    }
-
-    override fun authenticate(email: Email) {
-        println("This is authenticate method in ApplicationAuthenticator")
+    override fun authenticate(email: Email, password: Password): Authentication {
+        userRepository.find(email, password).let { user ->
+            return when {
+                user.hasNoBalance() -> failed(USUARIO_NAO_TEM_CREDITOS)
+                user.isDeleted -> failed(USUARIO_DELETADO)
+                user.accountIsDeleted() -> failed(USUARIO_CONTA_DELETADA)
+                user.accountIsBlocked() -> failed(USUARIO_CONTA_BLOQUEADA)
+                else -> Authentication.succeded()
+            }
+        }
     }
 
 }

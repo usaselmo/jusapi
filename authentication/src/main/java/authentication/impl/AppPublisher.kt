@@ -1,12 +1,12 @@
-package authentication.event
+package authentication.impl
 
 import authentication.domain.ApplicationEvent
 import authentication.domain.DomainEvent
-import authentication.domain.EventPublisher
+import authentication.domain.Publisher
 import org.springframework.stereotype.Component
 
 @Component
-class Publisher : EventPublisher {
+class AppPublisher : Publisher {
     override fun publish(event: DomainEvent) {
         println("publishing an domain event ....")
         // TODO("Not yet implemented")
