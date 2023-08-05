@@ -16,18 +16,17 @@ data class User(
     val isDeleted: Boolean,
 ) {
 
-    fun delete() =
+    fun delete(): User =
         copy(isDeleted = true, account = account.copy(isDeleted = true, isBlocked = true))
 
-    fun deleteAccount() =
+    fun deleteAccount(): User =
         copy(account = account.copy(isBlocked = true, isDeleted = true))
 
-    fun blockAccount() =
+    fun blockAccount(): User =
         copy(account = account.copy(isBlocked = true))
 
-    fun registerAccess(): User {
-        return copy(account = account.incrementAccessCount())
-    }
+    fun registerAccess(): User =
+        copy(account = account.incrementAccessCount())
 
     fun balance(): Long =
         account.balance()
@@ -38,10 +37,10 @@ data class User(
     fun hasNoBalance(): Boolean =
         account.balance() <= 0L
 
-    fun accountIsBlocked() =
+    fun accountIsBlocked(): Boolean =
         account.isBlocked
 
-    fun accountIsDeleted() =
+    fun accountIsDeleted(): Boolean =
         account.isDeleted
 
     fun setInitialCredit(): User {

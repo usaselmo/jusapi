@@ -30,7 +30,8 @@ class Factory(
             isDeleted = false
         ).let {
             when {
-                initialAction.contains(InitialAction.SET_INITIAL_CREDIT_FOR_STADARD_ACCOUNT) -> it.setInitialCredit()
+                initialAction.contains(InitialAction.SET_INITIAL_CREDIT_ACCORDING_TO_ACCOUNT_TYPE) -> it.setInitialCredit()
+                initialAction.contains(InitialAction.SET_ZERO_INITIAL_CREDIT) -> it.zerarCreditos()
                 else -> it
             }
         }.also {
@@ -41,6 +42,6 @@ class Factory(
 }
 
 enum class InitialAction {
-    SET_INITIAL_CREDIT_FOR_STADARD_ACCOUNT,
-    ZEROER_CREDIT
+    SET_INITIAL_CREDIT_ACCORDING_TO_ACCOUNT_TYPE,
+    SET_ZERO_INITIAL_CREDIT
 }

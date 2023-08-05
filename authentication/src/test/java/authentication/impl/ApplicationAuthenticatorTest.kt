@@ -1,11 +1,11 @@
 package authentication.impl
 
 import authentication.app.Factory
-import authentication.app.InitialAction.SET_INITIAL_CREDIT_FOR_STADARD_ACCOUNT
+import authentication.app.InitialAction.SET_INITIAL_CREDIT_ACCORDING_TO_ACCOUNT_TYPE
+import authentication.app.InitialAction.SET_ZERO_INITIAL_CREDIT
 import authentication.domain.Messages
 import authentication.domain.Publisher
 import authentication.domain.repository.UserRepository
-import model.Account
 import model.AccountType
 import model.Password
 import model.User
@@ -147,11 +147,11 @@ class ApplicationAuthenticatorTest {
         with(createUserWithInitialCredit()) {
             val balance = zerarCreditos()
                 .increaseBalance(5L)
-                .registerAccess()
-                .registerAccess()
-                .registerAccess()
-                .registerAccess()
-                .registerAccess()
+                .registerAccess() // 1
+                .registerAccess() // 2
+                .registerAccess() // 3
+                .registerAccess() // 4
+                .registerAccess() // 5
                 .balance()
             assertEquals(0L, balance)
         }
@@ -159,27 +159,31 @@ class ApplicationAuthenticatorTest {
 
     @Test
     fun ` deve definir credito inicial `() {
-        with(
-            factory.newUser(
-                name = UUID.randomUUID().toString(),
-                email = UUID.randomUUID().toString(),
-                SET_INITIAL_CREDIT_FOR_STADARD_ACCOUNT
-            )
-        ) {
-            assertEquals(AccountType.STANDARD.initialCredit, balance())
+        factory.newUser(
+            name = UUID.randomUUID().toString(),
+            email = UUID.randomUUID().toString(),
+            SET_INITIAL_CREDIT_ACCORDING_TO_ACCOUNT_TYPE
+        ).let {
+            assertEquals(AccountType.STANDARD.initialCredit, it.balance())
+        }
+        factory.newUser(
+            name = UUID.randomUUID().toString(),
+            email = UUID.randomUUID().toString(),
+            SET_ZERO_INITIAL_CREDIT
+        ).let {
+            assertEquals(0L, it.balance())
         }
     }
 
     @Test
     fun ` credito inicial deve ser zero`() {
-        with(
-            factory.newUser(
-                name = UUID.randomUUID().toString(),
-                email = UUID.randomUUID().toString()
-            )
-        ) {
-            assertEquals(0L, balance())
+        factory.newUser(
+            name = UUID.randomUUID().toString(),
+            email = UUID.randomUUID().toString()
+        ).let {
+            assertEquals(0L, it.balance())
         }
+
     }
 
 }
@@ -187,7 +191,7 @@ class ApplicationAuthenticatorTest {
 private fun createUserWithInitialCredit(): User = factory.newUser(
     name = UUID.randomUUID().toString(),
     email = UUID.randomUUID().toString(),
-    SET_INITIAL_CREDIT_FOR_STADARD_ACCOUNT
+    SET_INITIAL_CREDIT_ACCORDING_TO_ACCOUNT_TYPE
 )
 
 private fun createPassword() =
