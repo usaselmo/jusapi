@@ -6,6 +6,7 @@ import authentication.app.InitialAction.SET_ZERO_INITIAL_CREDIT
 import authentication.domain.Messages
 import authentication.domain.Publisher
 import authentication.domain.repository.UserRepository
+import model.Access
 import model.AccountType
 import model.Password
 import model.User
@@ -130,7 +131,7 @@ class ApplicationAuthenticatorTest {
     }
 
     @Test
-    fun ` quando acessa o sistem o saldo diminui `() {
+    fun ` quando acessa o sistema o saldo diminui `() {
         with(createUserWithInitialCredit()) {
             val initialBalance = balance()
             val endBalance = this.registerAccess()
@@ -184,6 +185,13 @@ class ApplicationAuthenticatorTest {
             assertEquals(0L, it.balance())
         }
 
+    }
+
+    @Test
+    fun ` quando registrar acesso saldo deve diminuir `() {
+        createUserWithInitialCredit().let { user ->
+            assertEquals(1L, user.balance() - authenticator.registerUserAccess(user, Access()).balance())
+        }
     }
 
 }
