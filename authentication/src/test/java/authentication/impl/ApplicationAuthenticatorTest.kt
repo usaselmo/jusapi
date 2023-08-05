@@ -5,6 +5,8 @@ import authentication.app.InitialAction.SET_INITIAL_CREDIT_FOR_STADARD_ACCOUNT
 import authentication.domain.Messages
 import authentication.domain.Publisher
 import authentication.domain.repository.UserRepository
+import model.Account
+import model.AccountType
 import model.Password
 import model.User
 import org.junit.jupiter.api.Test
@@ -115,6 +117,68 @@ class ApplicationAuthenticatorTest {
                     assertTrue(authentication.errorMessages.isEmpty())
                 }
             }
+        }
+    }
+
+    @Test
+    fun ` quando poe credito o saldo aumenta `() {
+        with(createUserWithInitialCredit()) {
+            val initialBalance = balance()
+            assertEquals(initialBalance + 100L, increaseBalance(100L).balance())
+            assertEquals(0L, zerarCreditos().balance())
+        }
+    }
+
+    @Test
+    fun ` quando acessa o sistem o saldo diminui `() {
+        with(createUserWithInitialCredit()) {
+            val initialBalance = balance()
+            val endBalance = this.registerAccess()
+                .registerAccess()
+                .registerAccess()
+                .balance()
+            assertEquals(initialBalance - 3L, endBalance)
+        }
+    }
+
+
+    @Test
+    fun ` quando usa todo o credito o saldo zera `() {
+        with(createUserWithInitialCredit()) {
+            val balance = zerarCreditos()
+                .increaseBalance(5L)
+                .registerAccess()
+                .registerAccess()
+                .registerAccess()
+                .registerAccess()
+                .registerAccess()
+                .balance()
+            assertEquals(0L, balance)
+        }
+    }
+
+    @Test
+    fun ` deve definir credito inicial `() {
+        with(
+            factory.newUser(
+                name = UUID.randomUUID().toString(),
+                email = UUID.randomUUID().toString(),
+                SET_INITIAL_CREDIT_FOR_STADARD_ACCOUNT
+            )
+        ) {
+            assertEquals(AccountType.STANDARD.initialCredit, balance())
+        }
+    }
+
+    @Test
+    fun ` credito inicial deve ser zero`() {
+        with(
+            factory.newUser(
+                name = UUID.randomUUID().toString(),
+                email = UUID.randomUUID().toString()
+            )
+        ) {
+            assertEquals(0L, balance())
         }
     }
 

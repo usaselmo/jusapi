@@ -20,7 +20,7 @@ class ApplicationAuthenticator(
 ) : Authenticator {
 
     fun registerUserAccess(user: User, access: Access): User {
-        return user.incrementAccessCount().also {
+        return user.registerAccess().also {
             publisher.publish(
                 UserAccessRegisteredDomainEvent(user = user, access = access)
             )
@@ -28,21 +28,24 @@ class ApplicationAuthenticator(
     }
 
     override fun authenticate(userId: UserId, password: Password): Authentication {
-        return Authentication(
-            isAuthenticated = true,
-            errorMessages = listOf()
-        )
+        userRepository.find(userId, password).let { user ->
+            return checkAuthentication(user)
+        }
     }
 
     override fun authenticate(email: Email, password: Password): Authentication {
         userRepository.find(email, password).let { user ->
-            return when {
-                user.hasNoBalance() -> failed(USUARIO_NAO_TEM_CREDITOS)
-                user.isDeleted -> failed(USUARIO_DELETADO)
-                user.accountIsDeleted() -> failed(USUARIO_CONTA_DELETADA)
-                user.accountIsBlocked() -> failed(USUARIO_CONTA_BLOQUEADA)
-                else -> Authentication.succeded()
-            }
+            return checkAuthentication(user)
+        }
+    }
+
+    private fun checkAuthentication(user: User): Authentication {
+        return when {
+            user.hasNoBalance() -> failed(USUARIO_NAO_TEM_CREDITOS)
+            user.isDeleted -> failed(USUARIO_DELETADO)
+            user.accountIsDeleted() -> failed(USUARIO_CONTA_DELETADA)
+            user.accountIsBlocked() -> failed(USUARIO_CONTA_BLOQUEADA)
+            else -> Authentication.succeded()
         }
     }
 

@@ -25,7 +25,7 @@ data class User(
     fun blockAccount() =
         copy(account = account.copy(isBlocked = true))
 
-    fun incrementAccessCount(): User {
+    fun registerAccess(): User {
         return copy(account = account.incrementAccessCount())
     }
 
@@ -44,8 +44,9 @@ data class User(
     fun accountIsDeleted() =
         account.isDeleted
 
-    fun setInitialCredit(): User =
-        copy(account = account.copy(usage = account.usage.copy(credit = 1000L)))
+    fun setInitialCredit(): User {
+        return copy(account = account.copy(usage = account.usage.copy(credit = account.type.initialCredit)))
+    }
 
     fun zerarCreditos(): User =
         copy(account = account.copy(usage = account.usage.copy(credit = 0L)))
@@ -75,8 +76,9 @@ data class AccountId(
     val value: String,
 )
 
-enum class AccountType {
-    STANDARD
+enum class AccountType(val initialCredit: Long) {
+    STANDARD(1000L);
+
 }
 
 data class Usage(
