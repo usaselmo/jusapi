@@ -1,10 +1,10 @@
 package authentication.impl.repository
 
 import authentication.domain.repository.UserRepository
-import model.Email
-import model.Password
-import model.User
-import model.UserId
+import model.api.Email
+import model.api.Password
+import model.api.User
+import model.api.UserId
 import org.springframework.stereotype.Component
 
 @Component

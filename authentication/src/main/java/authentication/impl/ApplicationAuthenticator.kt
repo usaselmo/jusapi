@@ -7,11 +7,11 @@ import authentication.domain.Messages.USUARIO_CONTA_BLOQUEADA
 import authentication.domain.Messages.USUARIO_CONTA_DELETADA
 import authentication.domain.Messages.USUARIO_DELETADO
 import authentication.domain.Messages.USUARIO_NAO_TEM_CREDITOS
-import authentication.domain.Publisher
-import authentication.domain.UserAccessRegisteredDomainEvent
-import authentication.domain.UserAuthenticatedDomainEvent
 import authentication.domain.repository.UserRepository
-import model.*
+import model.api.*
+import model.api.event.Publisher
+import model.api.event.UserAccessRegisteredDomainEvent
+import model.api.event.UserAuthenticatedDomainEvent
 import org.springframework.stereotype.Component
 
 @Component

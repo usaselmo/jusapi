@@ -1,7 +1,7 @@
 package ui.controller
 
-import authentication.domain.Publisher
-import authentication.domain.UserAuthenticatedDomainEvent
+import model.api.event.Publisher
+import model.api.event.UserAuthenticatedDomainEvent
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.security.core.annotation.AuthenticationPrincipal

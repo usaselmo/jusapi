@@ -1,9 +1,9 @@
 package authentication.domain.repository
 
-import model.Email
-import model.Password
-import model.User
-import model.UserId
+import model.api.Email
+import model.api.Password
+import model.api.User
+import model.api.UserId
 
 interface UserRepository {
     fun find(email: Email, password: Password): User

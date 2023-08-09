@@ -1,9 +1,8 @@
-package authentication.domain
+package model.api.event
 
-import authentication.api.Authentication
-import model.Access
-import model.User
-import model.UserId
+import model.api.Access
+import model.api.User
+import model.api.UserId
 
 data class UserCreatedDomainEvent(val user: User) : DomainEvent
 

@@ -1,8 +1,8 @@
 package authentication.app
 
-import authentication.domain.Publisher
-import authentication.domain.UserCreatedDomainEvent
-import model.*
+import model.api.*
+import model.api.event.Publisher
+import model.api.event.UserCreatedDomainEvent
 import java.time.LocalDateTime
 import java.util.*
 import java.util.function.Function

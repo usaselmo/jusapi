@@ -2,12 +2,12 @@ package authentication.impl
 
 import authentication.app.Factory
 import authentication.domain.Messages
-import authentication.domain.Publisher
 import authentication.domain.repository.UserRepository
-import model.Access
-import model.AccountType
-import model.Password
-import model.User
+import model.api.Access
+import model.api.AccountType
+import model.api.Password
+import model.api.User
+import model.api.event.Publisher
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`

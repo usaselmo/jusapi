@@ -1,8 +1,8 @@
 package authentication.api
 
-import model.Email
-import model.Password
-import model.UserId
+import model.api.Email
+import model.api.Password
+import model.api.UserId
 
 interface Authenticator {
     fun authenticate(userId: UserId, password: Password): Authentication
