@@ -10,6 +10,7 @@
         <version>3.1.2</version>
     </parent>
 
+    <groupId>br.com.jusapi</groupId>
     <artifactId>authentication</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>AUTHENTICATION ----- MODULE</name>

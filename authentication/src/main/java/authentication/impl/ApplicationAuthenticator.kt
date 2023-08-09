@@ -9,6 +9,7 @@ import authentication.domain.Messages.USUARIO_DELETADO
 import authentication.domain.Messages.USUARIO_NAO_TEM_CREDITOS
 import authentication.domain.Publisher
 import authentication.domain.UserAccessRegisteredDomainEvent
+import authentication.domain.UserAuthenticatedDomainEvent
 import authentication.domain.repository.UserRepository
 import model.*
 import org.springframework.stereotype.Component
@@ -27,11 +28,12 @@ class ApplicationAuthenticator(
         }
     }
 
-    override fun authenticate(userId: UserId, password: Password): Authentication {
-        userRepository.find(userId, password).let { user ->
-            return checkAuthentication(user)
-        }
-    }
+    override fun authenticate(userId: UserId, password: Password): Authentication =
+        checkAuthentication(userRepository.find(userId, password))
+            .also {
+                if (it.isAuthenticated)
+                    publisher.publish(UserAuthenticatedDomainEvent(userId = userId))
+            }
 
     override fun authenticate(email: Email, password: Password): Authentication {
         userRepository.find(email, password).let { user ->
@@ -45,7 +47,7 @@ class ApplicationAuthenticator(
             user.isDeleted -> failed(USUARIO_DELETADO)
             user.accountIsDeleted() -> failed(USUARIO_CONTA_DELETADA)
             user.accountIsBlocked() -> failed(USUARIO_CONTA_BLOQUEADA)
-            else -> Authentication.succeded()
+            else -> Authentication.succeeded()
         }
     }
 

@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component
 @Component
 class AppPublisher : Publisher {
     override fun publish(event: DomainEvent) {
-        println("publishing an domain event ....")
+        println("publishing an domain event: $event")
         // TODO("Not yet implemented")
     }
 
     override fun publish(event: ApplicationEvent) {
-        println("publishing an application event ....")
+        println("publishing an application event: $event")
         // TODO("Not yet implemented")
     }
 }

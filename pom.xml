@@ -21,7 +21,7 @@
         <module>ui</module>
         <module>authentication</module>
         <module>model</module>
-        <module>legis</module>
+        <module>trabalhista</module>
     </modules>
 
     <properties>

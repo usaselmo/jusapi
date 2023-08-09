@@ -1,207 +1,158 @@
 package authentication.impl
 
-import authentication.app.Factory
-import authentication.domain.Messages
+import authentication.domain.Messages.USUARIO_CONTA_BLOQUEADA
+import authentication.domain.Messages.USUARIO_CONTA_DELETADA
+import authentication.domain.Messages.USUARIO_DELETADO
+import authentication.domain.Messages.USUARIO_NAO_TEM_CREDITOS
 import authentication.domain.Publisher
+import authentication.domain.UserAccessRegisteredDomainEvent
+import authentication.domain.UserAuthenticatedDomainEvent
 import authentication.domain.repository.UserRepository
 import model.Access
-import model.AccountType
-import model.Password
-import model.User
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
-import java.util.*
-import kotlin.random.Random
-import kotlin.random.nextInt
+import org.mockito.Mockito
+import org.mockito.Mockito.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertSame
 import kotlin.test.assertTrue
-
-private val publisher: Publisher = mock(Publisher::class.java)
-private val factory = Factory(publisher = publisher)
 
 class ApplicationAuthenticatorTest {
 
-    private val userRepository: UserRepository = mock(UserRepository::class.java)
-    private val authenticator = ApplicationAuthenticator(
+    private val publisher = mock(Publisher::class.java)
+    private val userRepository = mock(UserRepository::class.java)
+
+    private val applicationAuthenticator = ApplicationAuthenticator(
         publisher = publisher,
         userRepository = userRepository
     )
 
     @Test
-    fun ` quando usuario nao bloqueado deve autenticar `() {
-        createUserWithCredit().let { userOK ->
-            createPassword().let { password ->
-                `when`(userRepository.find(userOK.email, password)).thenReturn(userOK)
-                authenticator.authenticate(userOK.email, password).let { authentication ->
-                    assertTrue { authentication.isAuthenticated }
-                    assertTrue { authentication.errorMessages.isEmpty() }
-                }
-            }
-        }
-    }
-
-    @Test
-    fun ` quando usuario deletado nao deve autenticar `() {
-        createUserWithCredit()
-            .delete().let { userDeleted ->
-                createPassword().let { password ->
-                    `when`(userRepository.find(userDeleted.email, password)).thenReturn(userDeleted)
-                    authenticator.authenticate(userDeleted.email, password).let { authentication ->
-                        assertFalse { authentication.isAuthenticated }
-                        assertSame(Messages.USUARIO_DELETADO, authentication.errorMessages[0])
-                    }
-                }
-            }
-    }
-
-    @Test
-    fun ` quando usuario conta bloqueada nao deve autenticar `() {
-        createUserWithCredit()
-            .blockAccount().let { userWithAccountBlocked ->
-                createPassword().let { password ->
-                    `when`(userRepository.find(userWithAccountBlocked.email, password)).thenReturn(userWithAccountBlocked)
-                    authenticator.authenticate(userWithAccountBlocked.email, password).let { authentication ->
-                        assertFalse { authentication.isAuthenticated }
-                        assertSame(Messages.USUARIO_CONTA_BLOQUEADA, authentication.errorMessages[0])
-                    }
-                }
-            }
-    }
-
-    @Test
-    fun ` quando usuario conta deletada nao deve autenticar `() {
-        createUserWithCredit()
-            .deleteAccount().let { userWithNoAccount ->
-                createPassword().let { password ->
-                    `when`(userRepository.find(userWithNoAccount.email, password)).thenReturn(userWithNoAccount)
-                    authenticator.authenticate(userWithNoAccount.email, password).let { authentication ->
-                        assertFalse { authentication.isAuthenticated }
-                        assertSame(Messages.USUARIO_CONTA_DELETADA, authentication.errorMessages[0])
-                    }
-                }
-            }
-    }
-
-    @Test
-    fun ` quando usuario conta sem credito nao deve autenticar `() {
-        with(createUserWithCredit()) {
-            zeroCredits().let { user ->
-                createPassword().let { password ->
-                    `when`(userRepository.find(user.email, password)).thenReturn(user)
-                    authenticator.authenticate(user.email, password).let { authentication ->
-                        assertFalse { authentication.isAuthenticated }
-                        assertEquals(Messages.USUARIO_NAO_TEM_CREDITOS, authentication.errorMessages[0])
-                    }
-                }
-            }
-        }
-    }
-
-    @Test
-    fun ` quando usuario renovar credito deve autenticar `() {
-        with(createUserWithCredit()) {
-            val password = createPassword()
-            zeroCredits().let { user ->
-                `when`(userRepository.find(user.email, password)).thenReturn(user)
-                authenticator.authenticate(user.email, password).let { authentication ->
-                    assertFalse { authentication.isAuthenticated }
-                    assertEquals(Messages.USUARIO_NAO_TEM_CREDITOS, authentication.errorMessages[0])
-                }
-            }
-            increaseBalance(1000L).let { user ->
-                `when`(userRepository.find(user.email, password)).thenReturn(user)
-                authenticator.authenticate(user.email, password).let { authentication ->
-                    assertTrue { authentication.isAuthenticated }
-                    assertTrue(authentication.errorMessages.isEmpty())
-                }
-            }
-        }
-    }
-
-    @Test
-    fun ` quando poe credito o saldo aumenta `() {
-        with(createUserWithCredit()) {
-            val initialBalance = balance()
-            assertEquals(initialBalance + 100L, increaseBalance(100L).balance())
-            assertEquals(0L, zeroCredits().balance())
-        }
-    }
-
-    @Test
-    fun ` quando acessa o sistema o saldo diminui `() {
-        with(createUserWithCredit()) {
-            val initialBalance = balance()
-            val endBalance = this.registerAccess() // 1
-                .registerAccess() // 2
-                .registerAccess() // 3
-                .balance()
-            assertEquals(initialBalance - 3L, endBalance)
-        }
-    }
-
-
-    @Test
-    fun ` quando usa todo o credito o saldo zera `() {
-        with(createUserWithCredit()) {
-            val balance = zeroCredits()
-                .increaseBalance(5L)
-                .registerAccess() // 1
-                .registerAccess() // 2
-                .registerAccess() // 3
-                .registerAccess() // 4
-                .registerAccess() // 5
-                .balance()
-            assertEquals(0L, balance)
-        }
-    }
-
-    @Test
-    fun ` deve definir credito inicial `() {
-        factory.newUser(
-            name = UUID.randomUUID().toString(),
-            email = UUID.randomUUID().toString()
-        ) {
-            it.setInitialCredit()
-        }.let {
-            assertEquals(AccountType.STANDARD.initialCredit, it.balance())
-        }
-        factory.newUser(
-            name = UUID.randomUUID().toString(),
-            email = UUID.randomUUID().toString(),
-        ).let {
-            assertEquals(0L, it.balance())
-        }
-    }
-
-    @Test
-    fun ` credito inicial deve ser zero`() {
-        factory.newUser(
-            name = UUID.randomUUID().toString(),
-            email = UUID.randomUUID().toString()
-        ).let {
-            assertEquals(0L, it.balance())
-        }
-
-    }
-
-    @Test
-    fun ` quando registrar acesso saldo deve diminuir `() {
+    fun ` when user authenticate should fire event `() {
         createUserWithCredit().let { user ->
-            assertEquals(1L, user.balance() - authenticator.registerUserAccess(user, Access()).balance())
+            createPassword().let { password ->
+                `when`(userRepository.find(user.id, password)).thenReturn(user)
+                applicationAuthenticator.authenticate(user.id, password)
+                verify(publisher, times(1)).publish(any(UserAuthenticatedDomainEvent::class.java))
+            }
         }
+    }
+
+    @Test
+    fun ` when user does not authenticate should not fire event `() {
+        createUserWithCredit().let { it ->
+            createPassword().let { password ->
+                it.zeroCredits().let { user ->
+                    `when`(userRepository.find(user.id, password)).thenReturn(user)
+                    applicationAuthenticator.authenticate(user.id, password)
+                    verify(publisher, times(0)).publish(any(UserAuthenticatedDomainEvent::class.java))
+                }
+                it.delete().let { user ->
+                    `when`(userRepository.find(user.id, password)).thenReturn(user)
+                    applicationAuthenticator.authenticate(user.id, password)
+                    verify(publisher, times(0)).publish(any(UserAuthenticatedDomainEvent::class.java))
+                }
+                it.deleteAccount().let { user ->
+                    `when`(userRepository.find(user.id, password)).thenReturn(user)
+                    applicationAuthenticator.authenticate(user.id, password)
+                    verify(publisher, times(0)).publish(any(UserAuthenticatedDomainEvent::class.java))
+                }
+                it.blockAccount().let { user ->
+                    `when`(userRepository.find(user.id, password)).thenReturn(user)
+                    applicationAuthenticator.authenticate(user.id, password)
+                    verify(publisher, times(0)).publish(any(UserAuthenticatedDomainEvent::class.java))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun ` when register user access should fire event `() {
+        createUserWithCredit().let { user ->
+            Access().let { access ->
+                applicationAuthenticator.registerUserAccess(user, access)
+                verify(publisher, times(1)).publish(any(UserAccessRegisteredDomainEvent::class.java))
+            }
+        }
+    }
+
+    @Test
+    fun ` when user has no credit should return USUARIO_NAO_TEM_CREDITOS `() {
+        createUserWithCredit()
+            .zeroCredits()
+            .let { userWithNoCredit ->
+                createPassword().let { password ->
+                    `when`(userRepository.find(userWithNoCredit.id, password)).thenReturn(userWithNoCredit)
+                    applicationAuthenticator.authenticate(userWithNoCredit.id, password).let { authentication ->
+                        assertFalse { authentication.isAuthenticated }
+                        assertFalse { authentication.errorMessages.isEmpty() }
+                        assertEquals(USUARIO_NAO_TEM_CREDITOS, authentication.errorMessages[0])
+                    }
+                }
+            }
+    }
+
+    @Test
+    fun ` when user is deleted should return USUARIO_DELETADO `() {
+        createUserWithCredit()
+            .delete()
+            .let { deletedUser ->
+                createPassword().let { password ->
+                    `when`(userRepository.find(deletedUser.id, password)).thenReturn(deletedUser)
+                    applicationAuthenticator.authenticate(deletedUser.id, password).let { authentication ->
+                        assertFalse { authentication.isAuthenticated }
+                        assertFalse { authentication.errorMessages.isEmpty() }
+                        assertEquals(USUARIO_DELETADO, authentication.errorMessages[0])
+                    }
+                }
+            }
+    }
+
+    @Test
+    fun ` when user account is deleted should return USUARIO_CONTA_DELETADA `() {
+        createUserWithCredit()
+            .deleteAccount()
+            .let { userWithDeletedAccount ->
+                createPassword().let { password ->
+                    `when`(userRepository.find(userWithDeletedAccount.id, password)).thenReturn(userWithDeletedAccount)
+                    applicationAuthenticator.authenticate(userWithDeletedAccount.id, password).let { authentication ->
+                        assertFalse { authentication.isAuthenticated }
+                        assertFalse { authentication.errorMessages.isEmpty() }
+                        assertEquals(USUARIO_CONTA_DELETADA, authentication.errorMessages[0])
+                    }
+                }
+            }
+    }
+
+    @Test
+    fun ` when user account is blocked should return USUARIO_CONTA_BLOQUEADA `() {
+        createUserWithCredit()
+            .blockAccount()
+            .let { userWithBlockedAccount ->
+                createPassword().let { password ->
+                    `when`(userRepository.find(userWithBlockedAccount.id, password)).thenReturn(userWithBlockedAccount)
+                    applicationAuthenticator.authenticate(userWithBlockedAccount.id, password).let { authentication ->
+                        assertFalse { authentication.isAuthenticated }
+                        assertFalse { authentication.errorMessages.isEmpty() }
+                        assertEquals(USUARIO_CONTA_BLOQUEADA, authentication.errorMessages[0])
+                    }
+                }
+            }
+    }
+
+    @Test
+    fun ` when user is OK should authenticate `() {
+        createUserWithCredit()
+            .let { user ->
+                createPassword().let { password ->
+                    `when`(userRepository.find(user.id, password)).thenReturn(user)
+                    applicationAuthenticator.authenticate(user.id, password).let { authentication ->
+                        assertTrue { authentication.isAuthenticated }
+                        assertTrue { authentication.errorMessages.isEmpty() }
+                    }
+                }
+            }
     }
 
 }
 
-private fun createUserWithCredit(): User = factory.newUser(
-    name = UUID.randomUUID().toString(),
-    email = UUID.randomUUID().toString()
-){
-    it.increaseBalance(Random.nextInt(5..90).toLong())
-}
-
-private fun createPassword() =
-    Password(UUID.randomUUID().toString())
+private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)

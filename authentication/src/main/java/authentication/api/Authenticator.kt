@@ -21,7 +21,7 @@ data class Authentication(
                 errorMessages = listOf(errorMessage)
             )
 
-        fun succeded() =
+        fun succeeded() =
             Authentication(
                 isAuthenticated = true,
                 errorMessages = listOf()

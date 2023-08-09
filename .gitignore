@@ -4,3 +4,6 @@
 /ui/target/
 /target/failsafe-reports/
 /legis/target/
+/trabalhista/target/failsafe-reports/failsafe-summary.xml
+/trabalhista/target/maven-archiver/pom.properties
+/trabalhista/target/trabalhista-0.0.1.jar
