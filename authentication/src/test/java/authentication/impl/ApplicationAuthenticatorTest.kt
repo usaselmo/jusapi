@@ -1,8 +1,6 @@
 package authentication.impl
 
 import authentication.app.Factory
-import authentication.app.InitialAction.SET_INITIAL_CREDIT_ACCORDING_TO_ACCOUNT_TYPE
-import authentication.app.InitialAction.SET_ZERO_INITIAL_CREDIT
 import authentication.domain.Messages
 import authentication.domain.Publisher
 import authentication.domain.repository.UserRepository
@@ -14,6 +12,8 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import java.util.*
+import kotlin.random.Random
+import kotlin.random.nextInt
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertSame
@@ -32,7 +32,7 @@ class ApplicationAuthenticatorTest {
 
     @Test
     fun ` quando usuario nao bloqueado deve autenticar `() {
-        createUserWithInitialCredit().let { userOK ->
+        createUserWithCredit().let { userOK ->
             createPassword().let { password ->
                 `when`(userRepository.find(userOK.email, password)).thenReturn(userOK)
                 authenticator.authenticate(userOK.email, password).let { authentication ->
@@ -45,7 +45,7 @@ class ApplicationAuthenticatorTest {
 
     @Test
     fun ` quando usuario deletado nao deve autenticar `() {
-        createUserWithInitialCredit()
+        createUserWithCredit()
             .delete().let { userDeleted ->
                 createPassword().let { password ->
                     `when`(userRepository.find(userDeleted.email, password)).thenReturn(userDeleted)
@@ -59,7 +59,7 @@ class ApplicationAuthenticatorTest {
 
     @Test
     fun ` quando usuario conta bloqueada nao deve autenticar `() {
-        createUserWithInitialCredit()
+        createUserWithCredit()
             .blockAccount().let { userWithAccountBlocked ->
                 createPassword().let { password ->
                     `when`(userRepository.find(userWithAccountBlocked.email, password)).thenReturn(userWithAccountBlocked)
@@ -73,7 +73,7 @@ class ApplicationAuthenticatorTest {
 
     @Test
     fun ` quando usuario conta deletada nao deve autenticar `() {
-        createUserWithInitialCredit()
+        createUserWithCredit()
             .deleteAccount().let { userWithNoAccount ->
                 createPassword().let { password ->
                     `when`(userRepository.find(userWithNoAccount.email, password)).thenReturn(userWithNoAccount)
@@ -87,8 +87,8 @@ class ApplicationAuthenticatorTest {
 
     @Test
     fun ` quando usuario conta sem credito nao deve autenticar `() {
-        with(createUserWithInitialCredit()) {
-            zerarCreditos().let { user ->
+        with(createUserWithCredit()) {
+            zeroCredits().let { user ->
                 createPassword().let { password ->
                     `when`(userRepository.find(user.email, password)).thenReturn(user)
                     authenticator.authenticate(user.email, password).let { authentication ->
@@ -102,9 +102,9 @@ class ApplicationAuthenticatorTest {
 
     @Test
     fun ` quando usuario renovar credito deve autenticar `() {
-        with(createUserWithInitialCredit()) {
+        with(createUserWithCredit()) {
             val password = createPassword()
-            zerarCreditos().let { user ->
+            zeroCredits().let { user ->
                 `when`(userRepository.find(user.email, password)).thenReturn(user)
                 authenticator.authenticate(user.email, password).let { authentication ->
                     assertFalse { authentication.isAuthenticated }
@@ -123,20 +123,20 @@ class ApplicationAuthenticatorTest {
 
     @Test
     fun ` quando poe credito o saldo aumenta `() {
-        with(createUserWithInitialCredit()) {
+        with(createUserWithCredit()) {
             val initialBalance = balance()
             assertEquals(initialBalance + 100L, increaseBalance(100L).balance())
-            assertEquals(0L, zerarCreditos().balance())
+            assertEquals(0L, zeroCredits().balance())
         }
     }
 
     @Test
     fun ` quando acessa o sistema o saldo diminui `() {
-        with(createUserWithInitialCredit()) {
+        with(createUserWithCredit()) {
             val initialBalance = balance()
-            val endBalance = this.registerAccess()
-                .registerAccess()
-                .registerAccess()
+            val endBalance = this.registerAccess() // 1
+                .registerAccess() // 2
+                .registerAccess() // 3
                 .balance()
             assertEquals(initialBalance - 3L, endBalance)
         }
@@ -145,8 +145,8 @@ class ApplicationAuthenticatorTest {
 
     @Test
     fun ` quando usa todo o credito o saldo zera `() {
-        with(createUserWithInitialCredit()) {
-            val balance = zerarCreditos()
+        with(createUserWithCredit()) {
+            val balance = zeroCredits()
                 .increaseBalance(5L)
                 .registerAccess() // 1
                 .registerAccess() // 2
@@ -162,15 +162,15 @@ class ApplicationAuthenticatorTest {
     fun ` deve definir credito inicial `() {
         factory.newUser(
             name = UUID.randomUUID().toString(),
-            email = UUID.randomUUID().toString(),
-            SET_INITIAL_CREDIT_ACCORDING_TO_ACCOUNT_TYPE
-        ).let {
+            email = UUID.randomUUID().toString()
+        ) {
+            it.setInitialCredit()
+        }.let {
             assertEquals(AccountType.STANDARD.initialCredit, it.balance())
         }
         factory.newUser(
             name = UUID.randomUUID().toString(),
             email = UUID.randomUUID().toString(),
-            SET_ZERO_INITIAL_CREDIT
         ).let {
             assertEquals(0L, it.balance())
         }
@@ -189,18 +189,19 @@ class ApplicationAuthenticatorTest {
 
     @Test
     fun ` quando registrar acesso saldo deve diminuir `() {
-        createUserWithInitialCredit().let { user ->
+        createUserWithCredit().let { user ->
             assertEquals(1L, user.balance() - authenticator.registerUserAccess(user, Access()).balance())
         }
     }
 
 }
 
-private fun createUserWithInitialCredit(): User = factory.newUser(
+private fun createUserWithCredit(): User = factory.newUser(
     name = UUID.randomUUID().toString(),
-    email = UUID.randomUUID().toString(),
-    SET_INITIAL_CREDIT_ACCORDING_TO_ACCOUNT_TYPE
-)
+    email = UUID.randomUUID().toString()
+){
+    it.increaseBalance(Random.nextInt(5..90).toLong())
+}
 
 private fun createPassword() =
     Password(UUID.randomUUID().toString())

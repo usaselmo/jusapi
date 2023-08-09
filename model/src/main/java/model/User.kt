@@ -16,10 +16,10 @@ data class User(
 ) {
 
     fun delete(): User =
-        copy(isDeleted = true, account = account.copy(isDeleted = true, isBlocked = true))
+        copy(isDeleted = true, account = account.delete())
 
     fun deleteAccount(): User =
-        copy(account = account.copy(isBlocked = true, isDeleted = true))
+        copy(account = account.delete())
 
     fun blockAccount(): User =
         copy(account = account.copy(isBlocked = true))
@@ -43,11 +43,11 @@ data class User(
         account.isDeleted
 
     fun setInitialCredit(): User {
-        return copy(account = account.copy(usage = account.usage.copy(credit = account.type.initialCredit)))
+        return copy(account = account.setInitialCredit())
     }
 
-    fun zerarCreditos(): User =
-        copy(account = account.copy(usage = account.usage.copy(credit = 0L)))
+    fun zeroCredits(): User =
+        copy(account = account.zeroCredits())
 
 }
 
@@ -62,12 +62,21 @@ data class Account(
     fun increaseCredit(ammount: Long): Account =
         copy(usage = usage.copy(credit = usage.credit + ammount))
 
-    fun balance() =
+    fun balance(): Long =
         usage.credit - usage.count
 
     fun incrementAccessCount(): Account {
         return copy(usage = usage.copy(count = usage.count + 1))
     }
+
+    fun setInitialCredit(): Account =
+        copy(usage = usage.copy(credit = type.initialCredit))
+
+    fun zeroCredits(): Account =
+        copy(usage = usage.copy(credit = 0L))
+
+    fun delete() : Account =
+        copy(isDeleted = true, isBlocked = true)
 }
 
 data class AccountId(
