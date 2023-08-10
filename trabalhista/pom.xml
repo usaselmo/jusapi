@@ -15,11 +15,6 @@
     <version>0.0.5</version>
     <name>TRABALHISTA -------- MODULE</name>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-    </properties>
-
     <build>
         <plugins>
             <plugin>

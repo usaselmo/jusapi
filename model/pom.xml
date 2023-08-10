@@ -15,12 +15,6 @@
     <version>0.0.5</version>
     <name>MODEL -------------- MODULE</name>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <spring.version>6.0.11</spring.version>
-    </properties>
-
     <dependencies>
 
         <!--SPRING-->
