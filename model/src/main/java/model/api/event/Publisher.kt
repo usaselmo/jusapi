@@ -1,8 +1,8 @@
 package model.api.event
 
-interface Publisher {
 
-    fun subscribe(eventName: String, listener: EventSubscriber)
-    fun publish(event: DomainEvent)
-    fun publish(event: ApplicationEvent)
+
+interface Publisher<in T : DomainEvent, in S : Subscriber<T>> {
+    fun publish(event: T)
+    fun <T> subscribe(key: Class<T>, subscriber: S)
 }

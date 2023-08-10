@@ -6,9 +6,7 @@ import authentication.domain.Messages.USUARIO_DELETADO
 import authentication.domain.Messages.USUARIO_NAO_TEM_CREDITOS
 import authentication.domain.repository.UserRepository
 import model.api.Access
-import model.api.event.Publisher
-import model.api.event.UserAccessRegisteredDomainEvent
-import model.api.event.UserAuthenticatedDomainEvent
+import model.api.event.*
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.*
@@ -18,7 +16,7 @@ import kotlin.test.assertTrue
 
 class ApplicationAuthenticatorTest {
 
-    private val publisher = mock(Publisher::class.java)
+    private val publisher: Publisher<DomainEvent, Subscriber<DomainEvent>> = mock(Publisher::class.java) as Publisher<DomainEvent, Subscriber<DomainEvent>>
     private val userRepository = mock(UserRepository::class.java)
 
     private val applicationAuthenticator = ApplicationAuthenticator(

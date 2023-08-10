@@ -9,14 +9,12 @@ import authentication.domain.Messages.USUARIO_DELETADO
 import authentication.domain.Messages.USUARIO_NAO_TEM_CREDITOS
 import authentication.domain.repository.UserRepository
 import model.api.*
-import model.api.event.Publisher
-import model.api.event.UserAccessRegisteredDomainEvent
-import model.api.event.UserAuthenticatedDomainEvent
+import model.api.event.*
 import org.springframework.stereotype.Component
 
 @Component
 class ApplicationAuthenticator(
-    private val publisher: Publisher,
+    private val publisher: Publisher<DomainEvent, Subscriber<DomainEvent>>,
     private val userRepository: UserRepository,
 ) : Authenticator {
 

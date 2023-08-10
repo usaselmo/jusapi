@@ -1,33 +1,49 @@
 package ui
 
+import authentication.app.Factory
+import model.api.Access
+import model.api.event.DomainEvent
+import model.api.event.Subscriber
+import model.api.event.UserAccessRegisteredDomainEvent
+import model.api.event.UserAuthenticatedDomainEvent
+import model.impl.JusApiPublisher
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.ComponentScan
 
 @SpringBootApplication
 @ComponentScan(value = ["ui", "authentication", "trabalhista", "model"])
-class Main
+class Main : CommandLineRunner {
 
+    @Autowired
+    lateinit var jusApiPublisher: JusApiPublisher<DomainEvent, Subscriber<DomainEvent>>
+
+    @Autowired lateinit var factory: Factory
+
+    override fun run(vararg args: String?) {
+
+        val accessSubscriber = AccessSubscriber()
+        val authenticationSubscriber = AuthenticationSubscriber()
+
+        jusApiPublisher.subscribe(UserAccessRegisteredDomainEvent::class.java, accessSubscriber as Subscriber<DomainEvent>)
+        jusApiPublisher.subscribe(
+            UserAuthenticatedDomainEvent::class.java,
+            authenticationSubscriber as Subscriber<DomainEvent>
+        )
+
+        jusApiPublisher.publish(UserAccessRegisteredDomainEvent(factory.newUser("nome", "email@gmail.com"), Access()))
+        jusApiPublisher.publish(UserAuthenticatedDomainEvent(
+            factory.newUser("nome", "email@gmail.com").id
+        ))
+    }
+}
 
 fun main(args: Array<String>) {
     runApplication<Main>(*args)
-
-    val publisher = MainPublisher<DomainEvent, Subscriber<DomainEvent>>()
-
-    val accessSubscriber = AccessSubscriber()
-    val authenticationSubscriber = AuthenticationSubscriber()
-
-    publisher.subscribe(UserAccessRegisteredDomainEvent::class.java, accessSubscriber as Subscriber<DomainEvent>)
-    publisher.subscribe(UserAuthenticatedDomainEvent::class.java, authenticationSubscriber as Subscriber<DomainEvent>)
-
-    publisher.publish(UserAccessRegisteredDomainEvent("Test ............. "))
 }
 
-
-interface DomainEvent
-interface Subscriber<in T : DomainEvent> {
-    fun handle(event: T)
-}
 
 class AccessSubscriber : Subscriber<UserAccessRegisteredDomainEvent> {
     override fun handle(event: UserAccessRegisteredDomainEvent) {
@@ -41,42 +57,3 @@ class AuthenticationSubscriber : Subscriber<UserAuthenticatedDomainEvent> {
     }
 }
 
-data class UserAuthenticatedDomainEvent(
-    val name: String
-) : DomainEvent {
-    init {
-        println("publishing event: $name")
-    }
-}
-
-data class UserAccessRegisteredDomainEvent(
-    val name: String
-) : DomainEvent {
-    init {
-        println("publishing event: $name")
-    }
-}
-
-interface Publisher<in T : DomainEvent, in S : Subscriber<T>> {
-    fun publish(event: T)
-    fun <T> subscribe(key: Class<T>, subscriber: S)
-}
-
-class MainPublisher<in T : DomainEvent, in S : Subscriber<T>> : Publisher<T, S> {
-
-    private val subscribers = linkedMapOf<String, MutableSet<S>>()
-    override fun publish(event: T) {
-        subscribers.forEach { (k, v) ->
-            if (k == event.javaClass.name)
-                v.forEach { it.handle(event) }
-        }
-    }
-
-    override fun <T> subscribe(key: Class<T>, subscriber: S) {
-        subscribers[key.name]?.add(subscriber) ?: run {
-            subscribers[key.name] = linkedSetOf(subscriber)
-        }.also {
-            println("Registering subscriber: ${key.name}")
-        }
-    }
-}

@@ -7,7 +7,9 @@ import model.api.Access
 import model.api.AccountType
 import model.api.Password
 import model.api.User
+import model.api.event.DomainEvent
 import model.api.event.Publisher
+import model.api.event.Subscriber
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
@@ -19,7 +21,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
-private val publisher: Publisher = mock(Publisher::class.java)
+private val publisher = mock(Publisher::class.java) as Publisher<DomainEvent, Subscriber<DomainEvent>>
 private val factory = Factory(publisher = publisher)
 
 class ComponentTest {

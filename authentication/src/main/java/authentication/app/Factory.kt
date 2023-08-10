@@ -1,14 +1,17 @@
 package authentication.app
 
 import model.api.*
+import model.api.event.DomainEvent
 import model.api.event.Publisher
+import model.api.event.Subscriber
 import model.api.event.UserCreatedDomainEvent
+import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.util.*
 import java.util.function.Function
-
+@Component
 class Factory(
-    private val publisher: Publisher,
+    private val publisher: Publisher<DomainEvent, Subscriber<DomainEvent>>,
 ) {
 
     val intFunction: (Int) -> Int = { i -> i }

@@ -1,28 +1,28 @@
 package model.impl
 
-import model.api.event.ApplicationEvent
 import model.api.event.DomainEvent
-import model.api.event.EventSubscriber
 import model.api.event.Publisher
+import model.api.event.Subscriber
 import org.springframework.stereotype.Component
+import java.util.function.Consumer
 
 @Component
-class JusApiPublisher : Publisher {
+class JusApiPublisher<in T : DomainEvent, in S : Subscriber<T>> : Publisher<T, S> {
 
-    private val eventSubscribers = mutableMapOf<String, EventSubscriber>()
-    override fun subscribe(eventName: String, listener: EventSubscriber) {
-        eventSubscribers[eventName] = listener
-    }
-
-    override fun publish(event: DomainEvent) {
-        eventSubscribers.forEach {
-            if(it.key == event.javaClass.name)
-                it.value.handle(event)
+    private val subscribers2 = linkedMapOf<String, MutableSet<Consumer<T>>>()
+    private val subscribers = linkedMapOf<String, MutableSet<S>>()
+    override fun publish(event: T) {
+        subscribers.forEach { (k, v) ->
+            if (k == event.javaClass.name)
+                v.forEach { it.handle(event) }
         }
     }
 
-    override fun publish(event: ApplicationEvent) {
-        println("publishing an application event: $event")
-        // TODO("Not yet implemented")
+    override fun <T> subscribe(key: Class<T>, subscriber: S) {
+        subscribers[key.name]?.add(subscriber) ?: run {
+            subscribers[key.name] = linkedSetOf(subscriber)
+        }.also {
+            println("Registering subscriber: ${key.name}")
+        }
     }
 }
