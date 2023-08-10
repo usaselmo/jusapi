@@ -1,5 +1,6 @@
 package authentication.impl.repository
 
+import authentication.app.Factory
 import authentication.domain.repository.UserRepository
 import model.api.Email
 import model.api.Password
@@ -8,12 +9,14 @@ import model.api.UserId
 import org.springframework.stereotype.Component
 
 @Component
-class UserRepositoryImpl : UserRepository {
+class UserRepositoryImpl(
+    private val factory: Factory //tirar isso depois
+) : UserRepository {
     override fun find(email: Email, password: Password): User {
-        TODO("Not yet implemented")
+        return factory.newUser("nome", "email@gmail.com")
     }
 
     override fun find(userId: UserId, password: Password): User {
-        TODO("Not yet implemented")
+        return factory.newUser("nome", "email@gmail.com")
     }
 }

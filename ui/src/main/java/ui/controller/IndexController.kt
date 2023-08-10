@@ -1,6 +1,8 @@
 package ui.controller
 
+import authentication.api.Authenticator
 import model.api.Access
+import model.api.Password
 import model.api.event.*
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
@@ -12,7 +14,8 @@ import ui.toModel
 
 @RestController
 class IndexController(
-    private val publisher: Publisher<DomainEvent, Subscriber<DomainEvent>>
+    private val publisher: Publisher<DomainEvent, Subscriber<DomainEvent>>,
+    private val authenticator: Authenticator
 ) {
 
     val log: Log = LogFactory.getLog(javaClass)
@@ -20,6 +23,7 @@ class IndexController(
     @GetMapping(value = ["", "/"])
     fun index(@AuthenticationPrincipal principal: OAuth2User): String {
         val user = principal.toModel()
+        authenticator.authenticate(user.email, Password("123"))
         publisher.publish(UserAuthenticatedDomainEvent(user.id))
         publisher.publish(UserAccessRegisteredDomainEvent(user, Access()))
         return "Sucesso!!!"

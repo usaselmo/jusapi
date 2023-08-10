@@ -15,10 +15,10 @@ data class Authentication(
 ) {
 
     companion object {
-        fun failed(errorMessage: String) =
+        fun failed(vararg errorMessage: String) =
             Authentication(
                 isAuthenticated = false,
-                errorMessages = listOf(errorMessage)
+                errorMessages = listOf(*errorMessage)
             )
 
         fun succeeded() =
