@@ -4,6 +4,9 @@ import authentication.api.UserRegistrationRequest
 import authentication.app.Factory
 import authentication.domain.AuthenticationException
 import authentication.domain.Messages
+import authentication.domain.Messages.ERROR_AO_BLOQUEAR_USUARIO
+import authentication.domain.Messages.ERROR_AO_DELETAR_USUARIO
+import authentication.domain.Messages.ERROR_USER_NOT_FOUND
 import authentication.domain.repository.UserRepository
 import authentication.impl.any
 import authentication.impl.createPassword
@@ -94,7 +97,6 @@ class JusApiUserServicesTest {
                     verify(mockUserRepository, times(1)).save(userWithIncreasedBalance)
                 }
         }
-        val user = createUserWithCredit()
     }
 
     @Test
@@ -109,6 +111,98 @@ class JusApiUserServicesTest {
                     }
                 }
         }
-        val user = createUserWithCredit()
     }
+
+    @Test
+    fun ` increase balance should throw AuthenticationException ERROR_USER_NOT_FOUND `(){
+        Credit.withDefaults(10L).let { credit ->
+            createUserWithCredit()
+                .zeroCredits().let { user ->
+                    `when`(mockUserRepository.find(user.id)).then { null }
+
+                    assertThrows<AuthenticationException>(ERROR_USER_NOT_FOUND) {
+                        jusApiUserServices.increaseBalance(user.id, credit)
+                    }
+                }
+        }
+    }
+
+    @Test
+    fun ` delete `() {
+        createUserWithCredit().let { user ->
+            `when`(mockUserRepository.find(user.id)).thenReturn(user)
+            doNothing().`when`(mockUserRepository).save(user)
+
+            jusApiUserServices.delete(user.id)
+
+            val userDeleted = user.delete()
+            verify(mockUserRepository, times(1)).find(user.id)
+            verify(mockUserRepository, never()).save(user)
+            verify(mockUserRepository, times(1)).save(userDeleted)
+        }
+    }
+
+    @Test
+    fun ` delete user should throw AuthenticationException `() {
+        createUserWithCredit().let { user ->
+            `when`(mockUserRepository.find(user.id)).then { throw Exception() }
+
+            assertThrows<AuthenticationException>(ERROR_AO_DELETAR_USUARIO) {
+                jusApiUserServices.delete(user.id)
+            }
+        }
+    }
+
+    @Test
+    fun ` block `() {
+        createUserWithCredit().let { user ->
+            user.blockAccount().let { blockedUser ->
+                `when`(mockUserRepository.find(user.id)).thenReturn(user)
+                doNothing().`when`(mockUserRepository).save(user)
+
+                jusApiUserServices.block(user.id)
+
+                verify(mockUserRepository, times(1)).find(user.id)
+                verify(mockUserRepository, never()).save(user)
+                verify(mockUserRepository, times(1)).save(blockedUser)
+            }
+        }
+    }
+
+    @Test
+    fun ` block should throw AuthenticationException `() {
+        createUserWithCredit().let { user ->
+            `when`(mockUserRepository.find(user.id)).then { throw Exception() }
+
+            assertThrows<AuthenticationException>(ERROR_AO_BLOQUEAR_USUARIO) {
+                jusApiUserServices.block(user.id)
+            }
+        }
+    }
+
+    @Test
+    fun ` block should throw AuthenticationException 2 `() {
+        createUserWithCredit().let { user ->
+            user.blockAccount().let { blockedUser ->
+                `when`(mockUserRepository.find(user.id)).thenReturn(user)
+                `when`(mockUserRepository.save(blockedUser)).then { throw Exception() }
+
+                assertThrows<AuthenticationException>(ERROR_AO_BLOQUEAR_USUARIO) {
+                    jusApiUserServices.block(user.id)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun ` block should throw AuthenticationException ERROR_USER_NOT_FOUND `() {
+        createUserWithCredit().let { user ->
+            `when`(mockUserRepository.find(user.id)).thenReturn(null)
+
+            assertThrows<AuthenticationException>(ERROR_USER_NOT_FOUND) {
+                jusApiUserServices.block(user.id)
+            }
+        }
+    }
+
 }

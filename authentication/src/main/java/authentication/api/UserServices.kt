@@ -11,5 +11,4 @@ interface UserServices {
     fun deleteAccount(userId: UserId):AccountId
     fun blockAccount(userId: UserId):AccountId
 
-
 }

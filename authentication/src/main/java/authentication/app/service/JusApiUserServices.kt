@@ -6,7 +6,9 @@ import authentication.api.UserServices
 import authentication.app.Factory
 import authentication.domain.AuthenticationException
 import authentication.domain.Messages.ERROR_AO_AUMENTAR_CREDITO_DE_USUARIO
+import authentication.domain.Messages.ERROR_AO_DELETAR_USUARIO
 import authentication.domain.Messages.ERROR_AO_REGISTRAR_NOVO_USUARIO
+import authentication.domain.Messages.ERROR_USER_NOT_FOUND
 import authentication.domain.repository.UserRepository
 import model.api.AccountId
 import model.api.Credit
@@ -47,10 +49,9 @@ class JusApiUserServices(
 
     override fun increaseBalance(userId: UserId, credit: Credit) {
         try {
-            userRepository.find(userId)
-                .increaseBalance(credit).let {
+            userRepository.find(userId)?.increaseBalance(credit)?.let {
                     userRepository.save(it)
-                }
+                } ?: throw AuthenticationException(ERROR_USER_NOT_FOUND)
         } catch (e: Exception) {
             log.error(e.message)
             throw AuthenticationException(ERROR_AO_AUMENTAR_CREDITO_DE_USUARIO)
@@ -58,11 +59,25 @@ class JusApiUserServices(
     }
 
     override fun delete(userId: UserId) {
-        TODO("Not yet implemented")
+        try {
+            userRepository.find(userId)?.delete()?.let {
+                userRepository.save(it)
+            } ?: throw AuthenticationException(ERROR_USER_NOT_FOUND)
+        } catch (e: Exception) {
+            log.error(e.message)
+            throw AuthenticationException(ERROR_AO_DELETAR_USUARIO)
+        }
     }
 
     override fun block(userId: UserId) {
-        TODO("Not yet implemented")
+        try {
+            userRepository.find(userId)?.blockAccount()?.let {
+                userRepository.save(it)
+            } ?: throw AuthenticationException(ERROR_USER_NOT_FOUND)
+        } catch (e: Exception) {
+            log.error(e.message)
+            throw AuthenticationException("")
+        }
     }
 
     override fun deleteAccount(userId: UserId): AccountId {
