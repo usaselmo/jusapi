@@ -4,7 +4,6 @@ import authentication.api.Authentication
 import authentication.api.Authentication.Companion.failed
 import authentication.api.Authenticator
 import authentication.domain.AuthenticationException
-import authentication.domain.Messages
 import authentication.domain.Messages.ERROR_USER_NOT_FOUND
 import authentication.domain.Messages.USUARIO_CONTA_BLOQUEADA
 import authentication.domain.Messages.USUARIO_CONTA_DELETADA
@@ -30,11 +29,14 @@ class ApplicationAuthenticator(
     }
 
     override fun authenticate(userId: UserId, password: Password): Authentication =
-        checkAuthentication(userRepository.find(userId, password))
-            .also {
-                if (it.isAuthenticated)
-                    publisher.publish(UserAuthenticatedDomainEvent(userId = userId))
-            }
+        userRepository.find(userId, password)?.let {
+            checkAuthentication(it)
+                .also { authentication ->
+                    if (authentication.isAuthenticated)
+                        publisher.publish(UserAuthenticatedDomainEvent(userId = userId))
+                }
+        } ?: throw AuthenticationException(ERROR_USER_NOT_FOUND)
+
 
     override fun authenticate(email: Email, password: Password): Authentication {
         userRepository.find(email, password)?.let { user ->

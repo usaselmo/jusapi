@@ -23,6 +23,7 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 val factory = Factory()
+
 @Suppress("UNCHECKED_CAST")
 class ApplicationAuthenticatorTest {
 
@@ -40,6 +41,18 @@ class ApplicationAuthenticatorTest {
                 `when`(userRepository.find(user.id, password)).thenReturn(user)
                 authenticator.authenticate(user.id, password)
                 verify(publisher, times(1)).publish(any(UserAuthenticatedDomainEvent::class.java))
+            }
+        }
+    }
+
+    @Test
+    fun ` when user not found should throw AuthenticationException `() {
+        createUserWithCredit().let { user ->
+            createPassword().let { password ->
+                `when`(userRepository.find(user.id, password)).thenReturn(null)
+                assertThrows<AuthenticationException> (ERROR_USER_NOT_FOUND){
+                    authenticator.authenticate(user.id, password)
+                }
             }
         }
     }
@@ -170,12 +183,13 @@ class ApplicationAuthenticatorTest {
         createUserWithCredit().let { userOK ->
             createPassword().let { password ->
                 `when`(userRepository.find(userOK.email, password)).thenReturn(null)
-                assertThrows <AuthenticationException>(ERROR_USER_NOT_FOUND){
+                assertThrows<AuthenticationException>(ERROR_USER_NOT_FOUND) {
                     authenticator.authenticate(userOK.email, password)
                 }
             }
         }
     }
+
     @Test
     fun ` quando usuario nao bloqueado deve autenticar `() {
         createUserWithCredit().let { userOK ->
