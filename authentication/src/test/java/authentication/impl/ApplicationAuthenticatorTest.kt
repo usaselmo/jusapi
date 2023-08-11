@@ -3,7 +3,7 @@ package authentication.impl
 import authentication.app.Factory
 import authentication.domain.AuthenticationException
 import authentication.domain.Messages.ERROR_AO_AUTENTICAR_USUARIO
-import authentication.domain.Messages.ERROR_USER_NOT_FOUND
+import authentication.domain.Messages.USUARIO_NAO_ENCONTRADO
 import authentication.domain.Messages.USUARIO_CONTA_BLOQUEADA
 import authentication.domain.Messages.USUARIO_CONTA_DELETADA
 import authentication.domain.Messages.USUARIO_DELETADO
@@ -64,7 +64,7 @@ class ApplicationAuthenticatorTest {
         createUserWithCredit().let { user ->
             createPassword().let { password ->
                 `when`(userRepository.find(user.id, password)).thenReturn(null)
-                assertThrows<AuthenticationException> (ERROR_USER_NOT_FOUND){
+                assertThrows<AuthenticationException> (USUARIO_NAO_ENCONTRADO){
                     authenticator.authenticate(user.id, password)
                 }
             }
@@ -220,7 +220,7 @@ class ApplicationAuthenticatorTest {
         createUserWithCredit().let { userOK ->
             createPassword().let { password ->
                 `when`(userRepository.find(userOK.email, password)).thenReturn(null)
-                assertThrows<AuthenticationException>(ERROR_USER_NOT_FOUND) {
+                assertThrows<AuthenticationException>(USUARIO_NAO_ENCONTRADO) {
                     authenticator.authenticate(userOK.email, password)
                 }
             }

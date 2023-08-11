@@ -4,9 +4,10 @@ import authentication.api.UserRegistrationRequest
 import authentication.app.Factory
 import authentication.domain.AuthenticationException
 import authentication.domain.Messages
+import authentication.domain.Messages.ERROR_AO_BLOQUEAR_CONTA_DE_USUARIO
 import authentication.domain.Messages.ERROR_AO_BLOQUEAR_USUARIO
 import authentication.domain.Messages.ERROR_AO_DELETAR_USUARIO
-import authentication.domain.Messages.ERROR_USER_NOT_FOUND
+import authentication.domain.Messages.USUARIO_NAO_ENCONTRADO
 import authentication.domain.repository.UserRepository
 import authentication.impl.any
 import authentication.impl.createPassword
@@ -115,13 +116,13 @@ class JusApiUserServicesTest {
     }
 
     @Test
-    fun ` increase balance should throw AuthenticationException ERROR_USER_NOT_FOUND `(){
+    fun ` increase balance should throw AuthenticationException ERROR_USER_NOT_FOUND `() {
         Credit.withDefaults(10L).let { credit ->
             createUserWithCredit()
                 .zeroCredits().let { user ->
                     `when`(mockUserRepository.find(user.id)).then { null }
 
-                    assertThrows<AuthenticationException>(ERROR_USER_NOT_FOUND) {
+                    assertThrows<AuthenticationException>(USUARIO_NAO_ENCONTRADO) {
                         jusApiUserServices.increaseBalance(user.id, credit)
                     }
                 }
@@ -131,15 +132,16 @@ class JusApiUserServicesTest {
     @Test
     fun ` delete `() {
         createUserWithCredit().let { user ->
-            `when`(mockUserRepository.find(user.id)).thenReturn(user)
-            doNothing().`when`(mockUserRepository).save(user)
+            user.delete().let { userDeleted ->
+                `when`(mockUserRepository.find(user.id)).thenReturn(user)
+                doNothing().`when`(mockUserRepository).save(userDeleted)
 
-            jusApiUserServices.delete(user.id)
+                jusApiUserServices.delete(user.id)
 
-            val userDeleted = user.delete()
-            verify(mockUserRepository, times(1)).find(user.id)
-            verify(mockUserRepository, never()).save(user)
-            verify(mockUserRepository, times(1)).save(userDeleted)
+                verify(mockUserRepository, times(1)).find(user.id)
+                verify(mockUserRepository, never()).save(user)
+                verify(mockUserRepository, times(1)).save(userDeleted)
+            }
         }
     }
 
@@ -200,8 +202,82 @@ class JusApiUserServicesTest {
         createUserWithCredit().let { user ->
             `when`(mockUserRepository.find(user.id)).thenReturn(null)
 
-            assertThrows<AuthenticationException>(ERROR_USER_NOT_FOUND) {
+            assertThrows<AuthenticationException>(USUARIO_NAO_ENCONTRADO) {
                 jusApiUserServices.block(user.id)
+            }
+        }
+    }
+
+    @Test
+    fun ` deleteAccount`() {
+        createUserWithCredit().let { user ->
+            user.deleteAccount().let { userAccountDeleted ->
+
+                `when`(mockUserRepository.find(user.id)).then { user }
+
+                jusApiUserServices.deleteAccount(user.id)
+
+                verify(mockUserRepository, times(1)).find(user.id)
+                verify(mockUserRepository, never()).save(user)
+                verify(mockUserRepository, times(1)).save(userAccountDeleted)
+            }
+        }
+    }
+
+    @Test
+    fun ` when deleteAccount fails should throw AuthenticationException `() {
+        createUserWithCredit().let { user ->
+            user.deleteAccount().let { userAccountDeleted ->
+
+                `when`(mockUserRepository.find(user.id)).then { throw Exception() }
+
+                assertThrows<AuthenticationException> {
+                    jusApiUserServices.deleteAccount(user.id)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun ` blockAccount`() {
+        createUserWithCredit().let { user ->
+            user.blockAccount().let { userAccountBlocked ->
+
+                `when`(mockUserRepository.find(user.id)).then { user }
+
+                jusApiUserServices.blockAccount(user.id)
+
+                verify(mockUserRepository, times(1)).find(user.id)
+                verify(mockUserRepository, never()).save(user)
+                verify(mockUserRepository, times(1)).save(userAccountBlocked)
+            }
+        }
+    }
+
+    @Test
+    fun ` when blockAccount user not found should throw AuthenticationException `() {
+        createUserWithCredit().let { user ->
+            user.blockAccount().let { userAccountBlocked ->
+
+                `when`(mockUserRepository.find(user.id)).then { null }
+
+                assertThrows<AuthenticationException>(USUARIO_NAO_ENCONTRADO) {
+                    jusApiUserServices.blockAccount(user.id)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun ` when blockAccount fails should throw AuthenticationException `() {
+        createUserWithCredit().let { user ->
+            user.blockAccount().let { userAccountBlocked ->
+
+                `when`(mockUserRepository.find(user.id)).then { throw Exception() }
+
+                assertThrows<AuthenticationException>(ERROR_AO_BLOQUEAR_CONTA_DE_USUARIO) {
+                    jusApiUserServices.blockAccount(user.id)
+                }
             }
         }
     }

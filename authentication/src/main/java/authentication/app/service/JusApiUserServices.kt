@@ -6,11 +6,12 @@ import authentication.api.UserServices
 import authentication.app.Factory
 import authentication.domain.AuthenticationException
 import authentication.domain.Messages.ERROR_AO_AUMENTAR_CREDITO_DE_USUARIO
+import authentication.domain.Messages.ERROR_AO_BLOQUEAR_CONTA_DE_USUARIO
+import authentication.domain.Messages.ERROR_AO_DELETAR_CONTA_DE_USUARIO
 import authentication.domain.Messages.ERROR_AO_DELETAR_USUARIO
 import authentication.domain.Messages.ERROR_AO_REGISTRAR_NOVO_USUARIO
-import authentication.domain.Messages.ERROR_USER_NOT_FOUND
+import authentication.domain.Messages.USUARIO_NAO_ENCONTRADO
 import authentication.domain.repository.UserRepository
-import model.api.AccountId
 import model.api.Credit
 import model.api.User
 import model.api.UserId
@@ -28,7 +29,7 @@ class JusApiUserServices(
     private val publisher: Publisher<DomainEvent, Subscriber<DomainEvent>>,
     private val factory: Factory
 ) : UserServices {
-    override fun register(userRegistrationRequest: UserRegistrationRequest): User {
+    override fun register(userRegistrationRequest: UserRegistrationRequest): User? {
         try {
             return factory.newUser(
                 name = userRegistrationRequest.name.loginName,
@@ -50,8 +51,8 @@ class JusApiUserServices(
     override fun increaseBalance(userId: UserId, credit: Credit) {
         try {
             userRepository.find(userId)?.increaseBalance(credit)?.let {
-                    userRepository.save(it)
-                } ?: throw AuthenticationException(ERROR_USER_NOT_FOUND)
+                userRepository.save(it)
+            } ?: throw AuthenticationException(USUARIO_NAO_ENCONTRADO)
         } catch (e: Exception) {
             log.error(e.message)
             throw AuthenticationException(ERROR_AO_AUMENTAR_CREDITO_DE_USUARIO)
@@ -62,7 +63,7 @@ class JusApiUserServices(
         try {
             userRepository.find(userId)?.delete()?.let {
                 userRepository.save(it)
-            } ?: throw AuthenticationException(ERROR_USER_NOT_FOUND)
+            } ?: throw AuthenticationException(USUARIO_NAO_ENCONTRADO)
         } catch (e: Exception) {
             log.error(e.message)
             throw AuthenticationException(ERROR_AO_DELETAR_USUARIO)
@@ -73,19 +74,33 @@ class JusApiUserServices(
         try {
             userRepository.find(userId)?.blockAccount()?.let {
                 userRepository.save(it)
-            } ?: throw AuthenticationException(ERROR_USER_NOT_FOUND)
+            } ?: throw AuthenticationException(USUARIO_NAO_ENCONTRADO)
         } catch (e: Exception) {
             log.error(e.message)
             throw AuthenticationException("")
         }
     }
 
-    override fun deleteAccount(userId: UserId): AccountId {
-        TODO("Not yet implemented")
+    override fun deleteAccount(userId: UserId) {
+        try {
+            userRepository.find(userId)?.deleteAccount()?.let { userAccountDeleted ->
+                userRepository.save(userAccountDeleted)
+            }
+        } catch (e: Exception) {
+            log.error(e.message)
+            throw AuthenticationException(ERROR_AO_DELETAR_CONTA_DE_USUARIO)
+        }
     }
 
-    override fun blockAccount(userId: UserId): AccountId {
-        TODO("Not yet implemented")
+    override fun blockAccount(userId: UserId) {
+        try {
+            userRepository.find(userId)?.blockAccount()?.let { userAccountBlocked ->
+                userRepository.save(userAccountBlocked)
+            } ?: throw AuthenticationException(USUARIO_NAO_ENCONTRADO)
+        } catch (e: Exception) {
+            log.error(e.message)
+            throw AuthenticationException(ERROR_AO_BLOQUEAR_CONTA_DE_USUARIO)
+        }
     }
 
     companion object {
