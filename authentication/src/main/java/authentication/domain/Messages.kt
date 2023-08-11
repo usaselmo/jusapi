@@ -11,4 +11,5 @@ object Messages {
     const val ERROR_AO_DELETAR_USUARIO = "Erro ao deletar usuário"
     const val ERROR_AO_BLOQUEAR_USUARIO = "Erro ao bloquear usuário"
     const val ERROR_USER_NOT_FOUND = "Usuário não encontrado"
+    const val ERROR_AO_AUTENTICAR_USUARIO = "Erro ao autenticar usuário"
 }

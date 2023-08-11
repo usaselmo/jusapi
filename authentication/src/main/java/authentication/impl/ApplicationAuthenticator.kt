@@ -4,6 +4,7 @@ import authentication.api.Authentication
 import authentication.api.Authentication.Companion.failed
 import authentication.api.Authenticator
 import authentication.domain.AuthenticationException
+import authentication.domain.Messages.ERROR_AO_AUTENTICAR_USUARIO
 import authentication.domain.Messages.ERROR_USER_NOT_FOUND
 import authentication.domain.Messages.USUARIO_CONTA_BLOQUEADA
 import authentication.domain.Messages.USUARIO_CONTA_DELETADA
@@ -21,27 +22,42 @@ class ApplicationAuthenticator(
 ) : Authenticator {
 
     fun registerUserAccess(user: User, access: Access): User {
-        return user.registerAccess().also {
-            publisher.publish(
-                UserAccessRegisteredDomainEvent(user = user, access = access)
-            )
+        try {
+            return user.registerAccess().also {
+                publisher.publish(
+                    UserAccessRegisteredDomainEvent(user = user, access = access)
+                )
+            }
+        } catch (e: Exception) {
+            log.error(e.message)
+            throw AuthenticationException(ERROR_AO_AUTENTICAR_USUARIO)
         }
     }
 
     override fun authenticate(userId: UserId, password: Password): Authentication =
-        userRepository.find(userId, password)?.let {
-            checkAuthentication(it)
-                .also { authentication ->
-                    if (authentication.isAuthenticated)
-                        publisher.publish(UserAuthenticatedDomainEvent(userId = userId))
-                }
-        } ?: throw AuthenticationException(ERROR_USER_NOT_FOUND)
+        try {
+            userRepository.find(userId, password)?.let {
+                checkAuthentication(it)
+                    .also { authentication ->
+                        if (authentication.isAuthenticated)
+                            publisher.publish(UserAuthenticatedDomainEvent(userId = userId))
+                    }
+            } ?: throw AuthenticationException(ERROR_USER_NOT_FOUND)
+        } catch (e: Exception) {
+            log.error(e.message)
+            throw AuthenticationException(ERROR_AO_AUTENTICAR_USUARIO)
+        }
 
 
     override fun authenticate(email: Email, password: Password): Authentication {
-        userRepository.find(email, password)?.let { user ->
-            return checkAuthentication(user)
-        } ?: throw AuthenticationException(ERROR_USER_NOT_FOUND)
+        try {
+            userRepository.find(email, password)?.let { user ->
+                return checkAuthentication(user)
+            } ?: throw AuthenticationException(ERROR_USER_NOT_FOUND)
+        } catch (e: Exception) {
+            log.error(e.message)
+            throw AuthenticationException(ERROR_AO_AUTENTICAR_USUARIO)
+        }
     }
 
     private fun checkAuthentication(user: User): Authentication {

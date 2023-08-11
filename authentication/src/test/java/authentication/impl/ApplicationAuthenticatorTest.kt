@@ -2,6 +2,7 @@ package authentication.impl
 
 import authentication.app.Factory
 import authentication.domain.AuthenticationException
+import authentication.domain.Messages.ERROR_AO_AUTENTICAR_USUARIO
 import authentication.domain.Messages.ERROR_USER_NOT_FOUND
 import authentication.domain.Messages.USUARIO_CONTA_BLOQUEADA
 import authentication.domain.Messages.USUARIO_CONTA_DELETADA
@@ -33,6 +34,19 @@ class ApplicationAuthenticatorTest {
         publisher = publisher,
         userRepository = userRepository
     )
+
+    @Test
+    fun ` when user authentication error should fire AuthenticationException `() {
+        createUserWithCredit().let { user ->
+            createPassword().let { password ->
+                `when`(userRepository.find(user.id, password)).thenReturn(user)
+                `when`(publisher.publish(any(DomainEvent::class.java))).then { throw Exception() }
+                assertThrows<AuthenticationException> {
+                    authenticator.authenticate(user.id, password)
+                }
+            }
+        }
+    }
 
     @Test
     fun ` when user authenticate should fire event `() {
@@ -109,6 +123,18 @@ class ApplicationAuthenticatorTest {
     }
 
     @Test
+    fun ` when register user access fails should Throw AuthenticationException `() {
+        createUserWithCredit().let { user ->
+            Access().let { access ->
+                `when`(publisher.publish(any(DomainEvent::class.java))).then { throw Exception() }
+                assertThrows <AuthenticationException>(ERROR_AO_AUTENTICAR_USUARIO){
+                    authenticator.registerUserAccess(user, access)
+                }
+            }
+        }
+    }
+
+    @Test
     fun ` when user has no credit should return USUARIO_NAO_TEM_CREDITOS `() {
         createUserWithCredit()
             .zeroCredits()
@@ -178,6 +204,17 @@ class ApplicationAuthenticatorTest {
      */
 
 
+    @Test
+    fun ` when authetication fails should throw AuthenticationException `() {
+        createUserWithCredit().let { userOK ->
+            createPassword().let { password ->
+                `when`(userRepository.find(userOK.email, password)).then { throw Exception() }
+                assertThrows<AuthenticationException>(ERROR_AO_AUTENTICAR_USUARIO) {
+                    authenticator.authenticate(userOK.email, password)
+                }
+            }
+        }
+    }
     @Test
     fun ` quando usuario nao encontrado deve lancar AuthenticationException  `() {
         createUserWithCredit().let { userOK ->
