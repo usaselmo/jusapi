@@ -85,7 +85,7 @@ class JusApiUserServices(
         try {
             userRepository.find(userId)?.deleteAccount()?.let { userAccountDeleted ->
                 userRepository.save(userAccountDeleted)
-            }
+            } ?: throw AuthenticationException(USUARIO_NAO_ENCONTRADO)
         } catch (e: Exception) {
             log.error(e.message)
             throw AuthenticationException(ERROR_AO_DELETAR_CONTA_DE_USUARIO)
