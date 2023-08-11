@@ -22,6 +22,7 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.*
 import java.util.*
 
+@Suppress("UNCHECKED_CAST")
 class JusApiUserServicesTest {
 
     private val mockUserRepository: UserRepository = mock(UserRepository::class.java)

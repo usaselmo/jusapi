@@ -3,6 +3,9 @@ package authentication.impl
 import authentication.api.Authentication
 import authentication.api.Authentication.Companion.failed
 import authentication.api.Authenticator
+import authentication.domain.AuthenticationException
+import authentication.domain.Messages
+import authentication.domain.Messages.ERROR_USER_NOT_FOUND
 import authentication.domain.Messages.USUARIO_CONTA_BLOQUEADA
 import authentication.domain.Messages.USUARIO_CONTA_DELETADA
 import authentication.domain.Messages.USUARIO_DELETADO
@@ -34,9 +37,9 @@ class ApplicationAuthenticator(
             }
 
     override fun authenticate(email: Email, password: Password): Authentication {
-        userRepository.find(email, password).let { user ->
+        userRepository.find(email, password)?.let { user ->
             return checkAuthentication(user)
-        }
+        } ?: throw AuthenticationException(ERROR_USER_NOT_FOUND)
     }
 
     private fun checkAuthentication(user: User): Authentication {
