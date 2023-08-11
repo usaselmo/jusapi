@@ -10,13 +10,21 @@ import org.springframework.stereotype.Component
 
 @Component
 class UserRepositoryImpl(
-    private val factory: Factory //tirar isso depois
+    private val factory: Factory // TODO tirar isso depois
 ) : UserRepository {
     override fun find(email: Email, password: Password): User {
-        return factory.newUser("nome", "email@gmail.com")
+        return factory.newUser("nome", "email@gmail.com") // TODO tirar isso depois
     }
 
     override fun find(userId: UserId, password: Password): User {
+        return factory.newUser("nome", "email@gmail.com") // TODO tirar isso depois
+    }
+
+    override fun find(userId: UserId): User {
         return factory.newUser("nome", "email@gmail.com")
+    }
+
+    override fun save(user: User) {
+        //TODO("Not yet implemented")
     }
 }

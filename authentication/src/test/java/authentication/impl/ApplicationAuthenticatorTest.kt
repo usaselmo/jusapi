@@ -153,4 +153,4 @@ class ApplicationAuthenticatorTest {
 
 }
 
-private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)
+fun <T> any(type: Class<T>): T = Mockito.any<T>(type)

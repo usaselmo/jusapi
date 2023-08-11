@@ -30,8 +30,8 @@ data class User(
     fun balance(): Long =
         account.balance()
 
-    fun increaseBalance(ammount: Long): User =
-        copy(account = account.increaseCredit(ammount))
+    fun increaseBalance(credit: Credit): User =
+        copy(account = account.increaseCredit(credit))
 
     fun hasNoBalance(): Boolean =
         account.balance() <= 0L
@@ -59,8 +59,8 @@ data class Account(
     val isBlocked: Boolean,
     val isDeleted: Boolean,
 ) {
-    fun increaseCredit(ammount: Long): Account =
-        copy(usage = usage.copy(credit = usage.credit + ammount))
+    fun increaseCredit(credit: Credit): Account =
+        copy(usage = usage.copy(credit = usage.credit + credit.value.value))
 
     fun balance(): Long =
         usage.credit - usage.count
@@ -94,5 +94,19 @@ data class Usage(
 )
 
 class Access {
-
 }
+
+data class Credit(
+    val value: Money,
+    val expires: Boolean
+) {
+    companion object {
+        fun withDefaults(amount: Long)=
+            Credit(value = Money(amount,0L), expires = false)
+    }
+}
+
+data class Money(
+    val value: Long,
+    val cents: Long
+)

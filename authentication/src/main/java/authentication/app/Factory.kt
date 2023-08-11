@@ -10,9 +10,7 @@ import java.time.LocalDateTime
 import java.util.*
 import java.util.function.Function
 @Component
-class Factory(
-    private val publisher: Publisher<DomainEvent, Subscriber<DomainEvent>>,
-) {
+class Factory() {
 
     val intFunction: (Int) -> Int = { i -> i }
     fun newUser(name: String, email: String, function: Function<User, User>? = Function { it }): User =
@@ -37,11 +35,7 @@ class Factory(
             )
         ) {
             function?.apply(this) ?: this
-        }.also {
-            publisher.publish(UserCreatedDomainEvent(it))
         }
-
-
 }
 
 enum class InitialAction {

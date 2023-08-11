@@ -32,9 +32,9 @@ data class UserAccessRegisteredDomainEvent(
 }
 
 data class UserCreatedDomainEvent(
-    val user: User
+    val userId: UserId
 ) : DomainEvent {
     init {
-        log.info("publishing user created event: ${user.name}")
+        log.info("publishing user created event: $userId")
     }
 }

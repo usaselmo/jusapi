@@ -3,10 +3,7 @@ package authentication.impl
 import authentication.app.Factory
 import authentication.domain.Messages
 import authentication.domain.repository.UserRepository
-import model.api.Access
-import model.api.AccountType
-import model.api.Password
-import model.api.User
+import model.api.*
 import model.api.event.DomainEvent
 import model.api.event.Publisher
 import model.api.event.Subscriber
@@ -22,7 +19,7 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 private val publisher = mock(Publisher::class.java) as Publisher<DomainEvent, Subscriber<DomainEvent>>
-private val factory = Factory(publisher = publisher)
+private val factory = Factory()
 
 class ComponentTest {
 
@@ -113,7 +110,7 @@ class ComponentTest {
                     assertEquals(Messages.USUARIO_NAO_TEM_CREDITOS, authentication.errorMessages[0])
                 }
             }
-            increaseBalance(1000L).let { user ->
+            increaseBalance(Credit.withDefaults(1000L)).let { user ->
                 `when`(userRepository.find(user.email, password)).thenReturn(user)
                 authenticator.authenticate(user.email, password).let { authentication ->
                     assertTrue { authentication.isAuthenticated }
@@ -127,7 +124,7 @@ class ComponentTest {
     fun ` quando poe credito o saldo aumenta `() {
         with(createUserWithCredit()) {
             val initialBalance = balance()
-            assertEquals(initialBalance + 100L, increaseBalance(100L).balance())
+            assertEquals(initialBalance + 100L, increaseBalance(Credit.withDefaults(100L)).balance())
             assertEquals(0L, zeroCredits().balance())
         }
     }
@@ -149,7 +146,7 @@ class ComponentTest {
     fun ` quando usa todo o credito o saldo zera `() {
         with(createUserWithCredit()) {
             val balance = zeroCredits()
-                .increaseBalance(5L)
+                .increaseBalance(Credit.withDefaults(5L))
                 .registerAccess() // 1
                 .registerAccess() // 2
                 .registerAccess() // 3
@@ -202,7 +199,7 @@ fun createUserWithCredit(): User = factory.newUser(
     name = randomUUID().toString(),
     email = createRandomEmail()
 ){
-    it.increaseBalance(Random.nextInt(5..90).toLong())
+    it.increaseBalance(Credit.withDefaults(Random.nextInt(5..90).toLong()))
 }
 
 fun createRandomEmail() =
