@@ -9,7 +9,7 @@ import model.api.UserId
 import org.springframework.stereotype.Component
 
 @Component
-class UserRepositoryImpl(
+class AuthenticationUserRepository(
     private val factory: Factory // TODO tirar isso depois
 ) : UserRepository {
     override fun find(email: Email, password: Password): User {

@@ -1,18 +1,13 @@
 package authentication.app
 
 import model.api.*
-import model.api.event.DomainEvent
-import model.api.event.Publisher
-import model.api.event.Subscriber
-import model.api.event.UserCreatedDomainEvent
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.util.*
 import java.util.function.Function
-@Component
-class Factory() {
 
-    val intFunction: (Int) -> Int = { i -> i }
+@Component
+class Factory {
     fun newUser(name: String, email: String, function: Function<User, User>? = Function { it }): User =
         with(
             User(
@@ -36,9 +31,4 @@ class Factory() {
         ) {
             function?.apply(this) ?: this
         }
-}
-
-enum class InitialAction {
-    SET_INITIAL_CREDIT_ACCORDING_TO_ACCOUNT_TYPE,
-    SET_ZERO_INITIAL_CREDIT
 }
