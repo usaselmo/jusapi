@@ -28,3 +28,12 @@ class AuthenticationUserRepository(
         //TODO("Not yet implemented")
     }
 }
+
+data class UserTable(
+    val password: Password,
+    val user: User
+)
+
+
+
+

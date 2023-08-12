@@ -5,14 +5,16 @@ import authentication.api.Authentication.Companion.failed
 import authentication.api.Authenticator
 import authentication.domain.AuthenticationException
 import authentication.domain.Messages.ERROR_AO_AUTENTICAR_USUARIO
-import authentication.domain.Messages.USUARIO_NAO_ENCONTRADO
 import authentication.domain.Messages.USUARIO_CONTA_BLOQUEADA
 import authentication.domain.Messages.USUARIO_CONTA_DELETADA
 import authentication.domain.Messages.USUARIO_DELETADO
+import authentication.domain.Messages.USUARIO_NAO_ENCONTRADO
 import authentication.domain.Messages.USUARIO_NAO_TEM_CREDITOS
 import authentication.domain.repository.UserRepository
 import model.api.*
 import model.api.event.*
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 import org.springframework.stereotype.Component
 
 @Component
@@ -69,5 +71,10 @@ class ApplicationAuthenticator(
             else -> Authentication.succeeded()
         }
     }
+
+    companion object {
+        val log: Log = LogFactory.getLog(this::class.java)
+    }
+
 
 }
