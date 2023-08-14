@@ -36,17 +36,22 @@ class JusApiUserServicesTest {
 
     @Test
     fun register() {
-        val user = factory.newUser(UUID.randomUUID().toString(), createRandomEmail())
-        val urr = UserRegistrationRequest(user.name, user.email, createPassword(), Credit.withDefaults(10L))
-        `when`(mockFactory.newUser(anyString(), anyString(), any())).thenReturn(user)
-        doNothing().`when`(mockUserRepository).save(user)
-        doNothing().`when`(mockPublisher).publish(any(UserCreatedDomainEvent::class.java))
+        val user = factory.newUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
+            createPassword().let { password ->
+                UserRegistrationRequest(user.name, user.email, password, Credit.withDefaults(10L)).let { urr->
 
-        jusApiUserServices.register(urr)
+                    `when`(mockFactory.newUser(anyString(), anyString(), any())).thenReturn(user)
+                    doNothing().`when`(mockUserRepository).update(user)
+                    doNothing().`when`(mockPublisher).publish(any(UserCreatedDomainEvent::class.java))
 
-        verify(mockUserRepository, times(1)).save(user)
-        verify(mockFactory, times(1)).newUser(anyString(), anyString(), any())
-        verify(mockPublisher, times(1)).publish(any(UserCreatedDomainEvent::class.java))
+                    jusApiUserServices.register(urr)
+
+                    verify(mockFactory, times(1)).newUser(anyString(), anyString(), any())
+                    verify(mockUserRepository, times(1)).register(user, password)
+                    verify(mockPublisher, times(1)).publish(any(UserCreatedDomainEvent::class.java))
+                }
+            }
+        }
     }
 
     @Test
@@ -62,11 +67,13 @@ class JusApiUserServicesTest {
     @Test
     fun ` register should throw AuthenticationException 2 `() {
         factory.newUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
-            UserRegistrationRequest(user.name, user.email, createPassword(), Credit.withDefaults(10L)).let { urr ->
-                `when`(mockFactory.newUser(anyString(), anyString(), any())).thenReturn(user)
-                `when`(mockUserRepository.save(user)).then { throw Exception() }
+            createPassword().let { password ->
+                UserRegistrationRequest(user.name, user.email, password, Credit.withDefaults(10L)).let { urr ->
+                    `when`(mockFactory.newUser(anyString(), anyString(), any())).thenReturn(user)
+                    `when`(mockUserRepository.register(user, password)).then { throw Exception() }
 
-                assertThrows<AuthenticationException> { jusApiUserServices.register(urr) }
+                    assertThrows<AuthenticationException> { jusApiUserServices.register(urr) }
+                }
             }
         }
     }
@@ -76,7 +83,7 @@ class JusApiUserServicesTest {
         factory.newUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
             UserRegistrationRequest(user.name, user.email, createPassword(), Credit.withDefaults(10L)).let { urr ->
                 `when`(mockFactory.newUser(anyString(), anyString(), any())).thenReturn(user)
-                doNothing().`when`(mockUserRepository).save(user)
+                doNothing().`when`(mockUserRepository).update(user)
                 `when`(mockPublisher.publish(any(UserCreatedDomainEvent::class.java))).then { throw Exception() }
 
                 assertThrows<AuthenticationException> { jusApiUserServices.register(urr) }
@@ -95,8 +102,8 @@ class JusApiUserServicesTest {
 
                     val userWithIncreasedBalance = user.increaseBalance(credit)
                     verify(mockUserRepository, times(1)).find(user.id)
-                    verify(mockUserRepository, never()).save(user)
-                    verify(mockUserRepository, times(1)).save(userWithIncreasedBalance)
+                    verify(mockUserRepository, never()).update(user)
+                    verify(mockUserRepository, times(1)).update(userWithIncreasedBalance)
                 }
         }
     }
@@ -134,13 +141,13 @@ class JusApiUserServicesTest {
         createUserWithCredit().let { user ->
             user.delete().let { userDeleted ->
                 `when`(mockUserRepository.find(user.id)).thenReturn(user)
-                doNothing().`when`(mockUserRepository).save(userDeleted)
+                doNothing().`when`(mockUserRepository).update(userDeleted)
 
                 jusApiUserServices.delete(user.id)
 
                 verify(mockUserRepository, times(1)).find(user.id)
-                verify(mockUserRepository, never()).save(user)
-                verify(mockUserRepository, times(1)).save(userDeleted)
+                verify(mockUserRepository, never()).update(user)
+                verify(mockUserRepository, times(1)).update(userDeleted)
             }
         }
     }
@@ -161,13 +168,13 @@ class JusApiUserServicesTest {
         createUserWithCredit().let { user ->
             user.blockAccount().let { blockedUser ->
                 `when`(mockUserRepository.find(user.id)).thenReturn(user)
-                doNothing().`when`(mockUserRepository).save(user)
+                doNothing().`when`(mockUserRepository).update(user)
 
                 jusApiUserServices.block(user.id)
 
                 verify(mockUserRepository, times(1)).find(user.id)
-                verify(mockUserRepository, never()).save(user)
-                verify(mockUserRepository, times(1)).save(blockedUser)
+                verify(mockUserRepository, never()).update(user)
+                verify(mockUserRepository, times(1)).update(blockedUser)
             }
         }
     }
@@ -188,7 +195,7 @@ class JusApiUserServicesTest {
         createUserWithCredit().let { user ->
             user.blockAccount().let { blockedUser ->
                 `when`(mockUserRepository.find(user.id)).thenReturn(user)
-                `when`(mockUserRepository.save(blockedUser)).then { throw Exception() }
+                `when`(mockUserRepository.update(blockedUser)).then { throw Exception() }
 
                 assertThrows<AuthenticationException>(ERROR_AO_BLOQUEAR_USUARIO) {
                     jusApiUserServices.block(user.id)
@@ -218,8 +225,8 @@ class JusApiUserServicesTest {
                 jusApiUserServices.deleteAccount(user.id)
 
                 verify(mockUserRepository, times(1)).find(user.id)
-                verify(mockUserRepository, never()).save(user)
-                verify(mockUserRepository, times(1)).save(userAccountDeleted)
+                verify(mockUserRepository, never()).update(user)
+                verify(mockUserRepository, times(1)).update(userAccountDeleted)
             }
         }
     }
@@ -265,8 +272,8 @@ class JusApiUserServicesTest {
                 jusApiUserServices.blockAccount(user.id)
 
                 verify(mockUserRepository, times(1)).find(user.id)
-                verify(mockUserRepository, never()).save(user)
-                verify(mockUserRepository, times(1)).save(userAccountBlocked)
+                verify(mockUserRepository, never()).update(user)
+                verify(mockUserRepository, times(1)).update(userAccountBlocked)
             }
         }
     }
@@ -298,5 +305,6 @@ class JusApiUserServicesTest {
             }
         }
     }
+
 
 }

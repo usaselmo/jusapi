@@ -31,4 +31,24 @@ class Factory {
         ) {
             function?.apply(this) ?: this
         }
+
+    fun newUser(userId: UserId, email: Email, name: Name): User =
+        User(
+            id = userId,
+            name = name,
+            email = email,
+            createdAt = LocalDateTime.now(),
+            account = Account(
+                id = AccountId(value = UUID.randomUUID().toString()),
+                type = AccountType.STANDARD,
+                createdAt = LocalDateTime.now(),
+                usage = Usage(
+                    count = 0L,
+                    credit = 0L
+                ),
+                isBlocked = false,
+                isDeleted = false
+            ),
+            isDeleted = false
+        )
 }
