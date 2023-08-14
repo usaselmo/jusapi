@@ -23,7 +23,6 @@ import org.springframework.security.authentication.event.AuthenticationSuccessEv
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Component
 import ui.Messages.ERRO_AO_REGISTRAR_NOVO_USUARIO
-import ui.adapter.Adapter
 import ui.exception.UIException
 
 @Configuration
