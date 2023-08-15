@@ -1,4 +1,4 @@
-package ui
+package ui.domain
 
 import model.api.*
 import org.springframework.security.oauth2.core.user.OAuth2User

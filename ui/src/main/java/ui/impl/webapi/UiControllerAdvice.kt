@@ -1,4 +1,4 @@
-package ui.controller
+package ui.impl.webapi
 
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus

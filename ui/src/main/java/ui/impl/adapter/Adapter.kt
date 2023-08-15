@@ -1,11 +1,11 @@
-package ui.adapter
+package ui.impl.adapter
 
 import authentication.api.UserServices
 import model.api.User
 import model.api.UserId
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Component
-import ui.exception.UIException
+import ui.domain.UIException
 
 @Component
 class Adapter(

@@ -1,9 +1,10 @@
-package ui
+package ui.app.config
 
 import model.api.event.*
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.stereotype.Component
+import ui.app.config.EventConfig.Companion.log
 
 @Suppress("UNCHECKED_CAST")
 @Component
@@ -20,10 +21,13 @@ class EventConfig(
             AuthenticationSubscriber() as Subscriber<DomainEvent>
         )
     }
+
+    companion object {
+        val log: Log = LogFactory.getLog(EventConfig::class.java)
+    }
+
 }
 
-
-val log: Log = LogFactory.getLog(EventConfig::class.java)
 
 class AccessSubscriber : Subscriber<UserAccessRegisteredDomainEvent> {
     override fun handle(event: UserAccessRegisteredDomainEvent) {

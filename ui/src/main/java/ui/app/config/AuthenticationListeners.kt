@@ -1,4 +1,4 @@
-package ui.config
+package ui.app.config
 
 import authentication.api.OAuthUserRegistrationRequest
 import authentication.api.UserServices
@@ -22,8 +22,9 @@ import org.springframework.security.authentication.event.AbstractAuthenticationF
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Component
-import ui.Messages.ERRO_AO_REGISTRAR_NOVO_USUARIO
-import ui.exception.UIException
+import ui.app.config.AuthenticationListeners.Companion.log
+import ui.domain.Messages.ERRO_AO_REGISTRAR_NOVO_USUARIO
+import ui.domain.UIException
 
 @Configuration
 class AuthenticationListeners(
@@ -36,9 +37,12 @@ class AuthenticationListeners(
         return DefaultAuthenticationEventPublisher(applicationEventPublisher)
     }
 
+    companion object {
+        val log: Log = LogFactory.getLog(AuthenticationListeners::class.java)
+    }
+
 }
 
-val log: Log = LogFactory.getLog(AuthenticationListeners::class.java)
 
 @Component
 class AuthenticationEvents(
