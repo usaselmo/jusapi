@@ -14,9 +14,9 @@ class JusApiPublisher<T : DomainEvent, S : Subscriber<T>> : Publisher {
     private val subscribers = linkedMapOf<String, MutableSet<S>>()
 
     override fun <T2 : DomainEvent> publish(event: T2) {
-        subscribers.forEach { (k, v) ->
-            if (k == event.javaClass.name)
-                v.forEach { it.handle(event as T) }
+        subscribers.forEach { (key, subscribers) ->
+            if (key == event.javaClass.name)
+                subscribers.forEach { it.handle(event as T) }
         }
     }
 
