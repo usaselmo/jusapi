@@ -6,9 +6,7 @@ import model.api.Email
 import model.api.Name
 import model.api.Password
 import model.api.UserId
-import model.api.event.DomainEvent
 import model.api.event.Publisher
-import model.api.event.Subscriber
 import model.api.event.UserAuthenticatedDomainEvent
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
@@ -47,7 +45,7 @@ class AuthenticationListeners(
 @Component
 class AuthenticationEvents(
     private val userServices: UserServices,
-    private val publisher: Publisher<DomainEvent, Subscriber<DomainEvent>>
+    private val publisher: Publisher
 ) {
     init {
         log.info("AuthenticationEvents created...")

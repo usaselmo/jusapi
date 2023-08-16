@@ -1,9 +1,7 @@
 package ui.impl.webapi
 
 import authentication.api.Authenticator
-import model.api.event.DomainEvent
 import model.api.event.Publisher
-import model.api.event.Subscriber
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -15,7 +13,7 @@ import ui.impl.adapter.Adapter
 
 @RestController
 class IndexController(
-    private val publisher: Publisher<DomainEvent, Subscriber<DomainEvent>>,
+    private val publisher: Publisher,
     private val authenticator: Authenticator,
     private val adapter: Adapter
 ) {

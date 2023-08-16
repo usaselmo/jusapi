@@ -12,14 +12,16 @@ import authentication.domain.Messages.USUARIO_NAO_ENCONTRADO
 import authentication.domain.Messages.USUARIO_NAO_TEM_CREDITOS
 import authentication.domain.repository.UserRepository
 import model.api.*
-import model.api.event.*
+import model.api.event.Publisher
+import model.api.event.UserAccessRegisteredDomainEvent
+import model.api.event.UserAuthenticatedDomainEvent
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.stereotype.Component
 
 @Component
 class ApplicationAuthenticator(
-    private val publisher: Publisher<DomainEvent, Subscriber<DomainEvent>>,
+    private val publisher: Publisher,
     private val userRepository: UserRepository,
 ) : Authenticator {
 

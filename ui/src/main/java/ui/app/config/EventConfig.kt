@@ -9,7 +9,7 @@ import ui.app.config.EventConfig.Companion.log
 @Suppress("UNCHECKED_CAST")
 @Component
 class EventConfig(
-    publisher: Publisher<DomainEvent, Subscriber<DomainEvent>>
+    publisher: Publisher
 ) {
     init {
         publisher.subscribe(

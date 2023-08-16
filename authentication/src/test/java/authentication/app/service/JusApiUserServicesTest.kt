@@ -27,7 +27,7 @@ import java.util.*
 class JusApiUserServicesTest {
 
     private val mockUserRepository: UserRepository = mock(UserRepository::class.java)
-    private val mockPublisher = mock(Publisher::class.java) as Publisher<DomainEvent, Subscriber<DomainEvent>>
+    private val mockPublisher = mock(Publisher::class.java) as Publisher
     private val mockFactory = mock(Factory::class.java)
     private val factory = Factory()
     private val jusApiUserServices = JusApiUserServices(

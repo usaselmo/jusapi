@@ -28,7 +28,7 @@ val factory = Factory()
 @Suppress("UNCHECKED_CAST")
 class ApplicationAuthenticatorTest {
 
-    private val publisher = mock(Publisher::class.java) as Publisher<DomainEvent, Subscriber<DomainEvent>>
+    private val publisher = mock(Publisher::class.java) as Publisher
     private val userRepository: UserRepository = mock(UserRepository::class.java)
     private val authenticator = ApplicationAuthenticator(
         publisher = publisher,

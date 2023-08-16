@@ -7,19 +7,22 @@ import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.stereotype.Component
 
+@Suppress("UNCHECKED_CAST")
 @Component
-class JusApiPublisher<in T : DomainEvent, in S : Subscriber<T>> : Publisher<T, S> {
+class JusApiPublisher<T : DomainEvent, S : Subscriber<T>> : Publisher {
+
     private val subscribers = linkedMapOf<String, MutableSet<S>>()
-    override fun publish(event: T) {
+
+    override fun <T2 : DomainEvent> publish(event: T2) {
         subscribers.forEach { (k, v) ->
             if (k == event.javaClass.name)
-                v.forEach { it.handle(event) }
+                v.forEach { it.handle(event as T) }
         }
     }
 
-    override fun <T> subscribe(key: Class<T>, subscriber: S) {
-        subscribers[key.name]?.add(subscriber) ?: run {
-            subscribers[key.name] = linkedSetOf(subscriber)
+    override fun <T2 : DomainEvent, S2 : Subscriber<T2>> subscribe(key: Class<T2>, subscriber: S2) {
+        subscribers[key.name]?.add(subscriber as S) ?: run {
+            subscribers[key.name] = linkedSetOf(subscriber as S)
         }.also {
             log.info("Registering subscriber: ${key.name}")
         }

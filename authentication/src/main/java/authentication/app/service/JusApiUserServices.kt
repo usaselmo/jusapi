@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component
 @Component
 class JusApiUserServices(
     private val userRepository: UserRepository,
-    private val publisher: Publisher<DomainEvent, Subscriber<DomainEvent>>,
+    private val publisher: Publisher,
     private val factory: Factory
 ) : UserServices {
 
