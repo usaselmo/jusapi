@@ -8,8 +8,8 @@ import model.api.Password
 
 interface UserServices {
 
-    fun register(userRegistrationRequest: UserRegistrationRequest): User?
-    fun register(oAuthUserRegistrationRequest: OAuthUserRegistrationRequest): User?
+    fun signup(userRegistrationRequest: UserRegistrationRequest): User?
+    fun signup(oAuthUserRegistrationRequest: OAuthUserRegistrationRequest): User?
     fun increaseBalance(userId: UserId, credit: Credit)
     fun delete(userId: UserId)
     fun block(userId: UserId)

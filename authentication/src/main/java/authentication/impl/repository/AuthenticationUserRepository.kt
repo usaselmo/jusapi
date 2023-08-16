@@ -38,7 +38,7 @@ class AuthenticationUserRepository : UserRepository {
             }
     }
 
-    override fun register(user: User, password: Password) {
+    override fun signup(user: User, password: Password) {
         if (users.any { it.user.id == user.id || it.user.email == user.email }) {
             log.error("Element exists already: $user")
             throw AuthenticationException("Element exists already")

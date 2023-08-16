@@ -44,10 +44,10 @@ class JusApiUserServicesTest {
                     doNothing().`when`(mockUserRepository).update(user)
                     doNothing().`when`(mockPublisher).publish(any(UserCreatedDomainEvent::class.java))
 
-                    jusApiUserServices.register(urr)
+                    jusApiUserServices.signup(urr)
 
                     verify(mockFactory, times(1)).newUser(anyString(), anyString(), any())
-                    verify(mockUserRepository, times(1)).register(user, password)
+                    verify(mockUserRepository, times(1)).signup(user, password)
                     verify(mockPublisher, times(1)).publish(any(UserCreatedDomainEvent::class.java))
                 }
             }
@@ -59,7 +59,7 @@ class JusApiUserServicesTest {
         factory.newUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
             UserRegistrationRequest(user.name, user.email, createPassword(), Credit.withDefaults(10L)).let { urr ->
                 `when`(mockFactory.newUser(anyString(), anyString(), any())).then { throw Exception("") }
-                assertThrows<AuthenticationException> { jusApiUserServices.register(urr) }
+                assertThrows<AuthenticationException> { jusApiUserServices.signup(urr) }
             }
         }
     }
@@ -70,9 +70,9 @@ class JusApiUserServicesTest {
             createPassword().let { password ->
                 UserRegistrationRequest(user.name, user.email, password, Credit.withDefaults(10L)).let { urr ->
                     `when`(mockFactory.newUser(anyString(), anyString(), any())).thenReturn(user)
-                    `when`(mockUserRepository.register(user, password)).then { throw Exception() }
+                    `when`(mockUserRepository.signup(user, password)).then { throw Exception() }
 
-                    assertThrows<AuthenticationException> { jusApiUserServices.register(urr) }
+                    assertThrows<AuthenticationException> { jusApiUserServices.signup(urr) }
                 }
             }
         }
@@ -86,7 +86,7 @@ class JusApiUserServicesTest {
                 doNothing().`when`(mockUserRepository).update(user)
                 `when`(mockPublisher.publish(any(UserCreatedDomainEvent::class.java))).then { throw Exception() }
 
-                assertThrows<AuthenticationException> { jusApiUserServices.register(urr) }
+                assertThrows<AuthenticationException> { jusApiUserServices.signup(urr) }
             }
         }
     }

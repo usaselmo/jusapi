@@ -59,7 +59,7 @@ class AuthenticationEvents(
             (success.authentication.principal as OAuth2User).let { oAuth2User ->
                 UserId((oAuth2User.attributes["id"] as Int).toString()).let { userId ->
                     if (!userServices.exists(userId)) {
-                        userServices.register(
+                        userServices.signup(
                             OAuthUserRegistrationRequest(
                                 name = Name(
                                     fullName = oAuth2User.attributes["name"] as String,
