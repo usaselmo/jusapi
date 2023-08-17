@@ -5,4 +5,5 @@ open module jusapi.core {
 
     exports core.api.event;
     exports core.api.model;
+    exports core.api.email;
 }

@@ -3,7 +3,9 @@ open module jusapi.ui {
     requires kotlin.reflect;
     requires spring.jcl;
     requires spring.context;
+
     requires jusapi.core;
+
     requires jusapi.authentication;
     requires spring.security.oauth2.core;
     requires spring.web;

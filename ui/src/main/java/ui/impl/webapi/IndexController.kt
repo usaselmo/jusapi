@@ -1,7 +1,9 @@
 package ui.impl.webapi
 
-import authentication.api.Authenticator
-import core.api.event.Publisher
+import core.api.email.Body
+import core.api.email.EmailSender
+import core.api.email.To
+import core.api.model.Email
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -13,8 +15,7 @@ import ui.impl.adapter.Adapter
 
 @RestController
 class IndexController(
-    private val publisher: Publisher,
-    private val authenticator: Authenticator,
+    private val emailSender: EmailSender,
     private val adapter: Adapter
 ) {
 
@@ -23,8 +24,10 @@ class IndexController(
     @GetMapping(value = ["", "/"])
     fun index(@AuthenticationPrincipal principal: OAuth2User): String {
         val user = adapter.toModel(principal)
-        if(true)
-            throw UIException("erro de proposito")
+        emailSender.send(
+            to = To(destinations = setOf(Email("anselmo.sr@gmail.com"))),
+            body = Body("")
+        )
         return "Sucesso!!!"
     }
 
