@@ -27,7 +27,7 @@
         <!--LOCAL MODULES-->
         <dependency>
             <groupId>br.com.jusapi</groupId>
-            <artifactId>model</artifactId>
+            <artifactId>core</artifactId>
             <version>0.0.5</version>
         </dependency>
 

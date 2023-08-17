@@ -1,6 +1,6 @@
 package authentication.app
 
-import model.api.*
+import core.api.model.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.util.*

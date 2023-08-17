@@ -13,11 +13,9 @@ import authentication.impl.any
 import authentication.impl.createPassword
 import authentication.impl.createRandomEmail
 import authentication.impl.createUserWithCredit
-import model.api.Credit
-import model.api.event.DomainEvent
-import model.api.event.Publisher
-import model.api.event.Subscriber
-import model.api.event.UserCreatedDomainEvent
+import core.api.model.Credit
+import core.api.event.Publisher
+import core.api.event.UserCreatedDomainEvent
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.*

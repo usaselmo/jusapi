@@ -9,8 +9,8 @@ import authentication.domain.Messages.USUARIO_CONTA_DELETADA
 import authentication.domain.Messages.USUARIO_DELETADO
 import authentication.domain.Messages.USUARIO_NAO_TEM_CREDITOS
 import authentication.domain.repository.UserRepository
-import model.api.*
-import model.api.event.*
+import core.api.event.*
+import core.api.model.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito

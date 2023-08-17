@@ -2,9 +2,9 @@
 /target/
 /jusapi.iml
 
-/model/.idea/
-/model/target/
-/model/model.iml
+/core/.idea/
+/core/target/
+/core/core.iml
 
 /ui/.idea/
 /ui/target/
@@ -17,3 +17,4 @@
 /authentication/.idea/
 /authentication/target/
 /authentication/authentication.iml
+/model/core.iml

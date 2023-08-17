@@ -1,8 +1,8 @@
-open module model {
+open module jusapi.core {
     requires kotlin.stdlib;
     requires spring.jcl;
     requires spring.context;
 
-    exports model.api.event;
-    exports model.api;
+    exports core.api.event;
+    exports core.api.model;
 }

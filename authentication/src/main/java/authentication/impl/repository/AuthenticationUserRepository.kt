@@ -2,10 +2,10 @@ package authentication.impl.repository
 
 import authentication.domain.AuthenticationException
 import authentication.domain.repository.UserRepository
-import model.api.Email
-import model.api.Password
-import model.api.User
-import model.api.UserId
+import core.api.model.Email
+import core.api.model.Password
+import core.api.model.User
+import core.api.model.UserId
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.stereotype.Component

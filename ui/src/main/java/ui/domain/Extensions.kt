@@ -1,6 +1,6 @@
 package ui.domain
 
-import model.api.*
+import core.api.model.*
 import org.springframework.security.oauth2.core.user.OAuth2User
 import java.time.LocalDateTime
 import java.util.*

@@ -2,12 +2,12 @@ package ui.app.config
 
 import authentication.api.OAuthUserRegistrationRequest
 import authentication.api.UserServices
-import model.api.Email
-import model.api.Name
-import model.api.Password
-import model.api.UserId
-import model.api.event.Publisher
-import model.api.event.UserAuthenticatedDomainEvent
+import core.api.model.Email
+import core.api.model.Name
+import core.api.model.Password
+import core.api.model.UserId
+import core.api.event.Publisher
+import core.api.event.UserAuthenticatedDomainEvent
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.context.ApplicationEventPublisher

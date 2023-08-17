@@ -1,6 +1,6 @@
-open module authentication {
+open module jusapi.authentication {
     requires kotlin.stdlib;
-    requires model;
+    requires jusapi.core;
     requires spring.context;
     requires spring.jcl;
 

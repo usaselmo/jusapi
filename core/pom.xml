@@ -11,9 +11,9 @@
     </parent>
 
     <groupId>br.com.jusapi</groupId>
-    <artifactId>model</artifactId>
+    <artifactId>core</artifactId>
     <version>0.0.5</version>
-    <name>MODEL -------------- MODULE</name>
+    <name>CORE --------------- MODULE</name>
 
     <dependencies>
 

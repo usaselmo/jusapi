@@ -1,22 +1,18 @@
 package authentication.api
 
-import model.api.*
-import model.api.Credit
-import model.api.Email
-import model.api.Name
-import model.api.Password
+import core.api.model.*
 
 interface UserServices {
 
-    fun signup(userRegistrationRequest: UserRegistrationRequest): User?
-    fun signup(oAuthUserRegistrationRequest: OAuthUserRegistrationRequest): User?
-    fun increaseBalance(userId: UserId, credit: Credit)
-    fun delete(userId: UserId)
-    fun block(userId: UserId)
-    fun deleteAccount(userId: UserId)
-    fun blockAccount(userId: UserId)
-    fun find(userId: UserId): User?
-    fun exists(userId: UserId): Boolean
+    fun signup(userRegistrationRequest: UserRegistrationRequest): core.api.model.User?
+    fun signup(oAuthUserRegistrationRequest: OAuthUserRegistrationRequest): core.api.model.User?
+    fun increaseBalance(userId: core.api.model.UserId, credit: Credit)
+    fun delete(userId: core.api.model.UserId)
+    fun block(userId: core.api.model.UserId)
+    fun deleteAccount(userId: core.api.model.UserId)
+    fun blockAccount(userId: core.api.model.UserId)
+    fun find(userId: core.api.model.UserId): core.api.model.User?
+    fun exists(userId: core.api.model.UserId): Boolean
 
 }
 
@@ -30,6 +26,6 @@ data class UserRegistrationRequest(
 data class OAuthUserRegistrationRequest(
     val name: Name,
     val email: Email,
-    val userId: UserId,
+    val userId: core.api.model.UserId,
     val password: Password
 )

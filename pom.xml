@@ -20,7 +20,7 @@
     <modules>
         <module>ui</module>
         <module>authentication</module>
-        <module>model</module>
+        <module>core</module>
         <module>trabalhista</module>
     </modules>
 

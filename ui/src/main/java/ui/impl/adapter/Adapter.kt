@@ -1,8 +1,8 @@
 package ui.impl.adapter
 
 import authentication.api.UserServices
-import model.api.User
-import model.api.UserId
+import core.api.model.User
+import core.api.model.UserId
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Component
 import ui.domain.UIException

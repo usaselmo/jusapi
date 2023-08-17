@@ -1,10 +1,10 @@
-open module ui {
+open module jusapi.ui {
     requires kotlin.stdlib;
     requires kotlin.reflect;
     requires spring.jcl;
     requires spring.context;
-    requires model;
-    requires authentication;
+    requires jusapi.core;
+    requires jusapi.authentication;
     requires spring.security.oauth2.core;
     requires spring.web;
     requires org.apache.tomcat.embed.core;

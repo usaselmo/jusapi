@@ -1,4 +1,4 @@
-package model.api
+package core.api.model
 
 data class Name(
     val fullName: String,

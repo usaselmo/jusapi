@@ -11,10 +11,10 @@ import authentication.domain.Messages.USUARIO_DELETADO
 import authentication.domain.Messages.USUARIO_NAO_ENCONTRADO
 import authentication.domain.Messages.USUARIO_NAO_TEM_CREDITOS
 import authentication.domain.repository.UserRepository
-import model.api.*
-import model.api.event.Publisher
-import model.api.event.UserAccessRegisteredDomainEvent
-import model.api.event.UserAuthenticatedDomainEvent
+import core.api.event.Publisher
+import core.api.event.UserAccessRegisteredDomainEvent
+import core.api.event.UserAuthenticatedDomainEvent
+import core.api.model.*
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.stereotype.Component

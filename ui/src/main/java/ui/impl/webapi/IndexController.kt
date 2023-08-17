@@ -1,7 +1,7 @@
 package ui.impl.webapi
 
 import authentication.api.Authenticator
-import model.api.event.Publisher
+import core.api.event.Publisher
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.security.core.annotation.AuthenticationPrincipal

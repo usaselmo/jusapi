@@ -1,4 +1,4 @@
-package model.api.event
+package core.api.event
 
 
 interface Publisher {

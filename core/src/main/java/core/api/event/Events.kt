@@ -1,8 +1,8 @@
-package model.api.event
+package core.api.event
 
-import model.api.Access
-import model.api.User
-import model.api.UserId
+import core.api.model.Access
+import core.api.model.User
+import core.api.model.UserId
 
 interface DomainEvent
 interface ApplicationEvent

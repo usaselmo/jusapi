@@ -1,4 +1,4 @@
-package model.api
+package core.api.model
 
 data class Password(
     val value: String,

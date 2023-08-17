@@ -1,8 +1,8 @@
-package model.impl
+package core.impl
 
-import model.api.event.DomainEvent
-import model.api.event.Publisher
-import model.api.event.Subscriber
+import core.api.event.DomainEvent
+import core.api.event.Publisher
+import core.api.event.Subscriber
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.stereotype.Component
