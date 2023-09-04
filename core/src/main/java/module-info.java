@@ -1,9 +1,8 @@
 open module jusapi.core {
     requires kotlin.stdlib;
-    requires spring.jcl;
-    requires spring.context;
+   requires javax.inject;
 
-    exports core.api.event;
+   exports core.api.event;
     exports core.api.model;
     exports core.api.email;
 }
