@@ -279,7 +279,7 @@ class JusApiUserServicesTest {
     @Test
     fun ` when blockAccount user not found should throw AuthenticationException `() {
         createUserWithCredit().let { user ->
-            user.blockAccount().let { userAccountBlocked ->
+            user.blockAccount().let {
 
                 `when`(mockUserRepository.find(user.id)).then { null }
 
@@ -293,7 +293,7 @@ class JusApiUserServicesTest {
     @Test
     fun ` when blockAccount fails should throw AuthenticationException `() {
         createUserWithCredit().let { user ->
-            user.blockAccount().let { userAccountBlocked ->
+            user.blockAccount().let {
 
                 `when`(mockUserRepository.find(user.id)).then { throw Exception() }
 
