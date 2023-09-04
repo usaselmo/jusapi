@@ -1,4 +1,4 @@
-package ui.impl.adapter
+package ui.impl.webapi
 
 import authentication.api.UserServices
 import core.api.model.User
