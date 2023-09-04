@@ -13,11 +13,11 @@ import authentication.domain.Messages.ERROR_AO_DELETAR_USUARIO
 import authentication.domain.Messages.ERROR_AO_REGISTRAR_NOVO_USUARIO
 import authentication.domain.Messages.USUARIO_NAO_ENCONTRADO
 import authentication.domain.repository.UserRepository
+import core.api.event.Publisher
+import core.api.event.UserCreatedDomainEvent
 import core.api.model.Credit
 import core.api.model.User
 import core.api.model.UserId
-import core.api.event.Publisher
-import core.api.event.UserCreatedDomainEvent
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.springframework.stereotype.Component
@@ -31,26 +31,28 @@ class JusApiUserServices(
 
     override fun signup(oAuthUserRegistrationRequest: OAuthUserRegistrationRequest) =
         try {
-            factory.newUser(oAuthUserRegistrationRequest.userId, oAuthUserRegistrationRequest.email, oAuthUserRegistrationRequest.name).let { userCreated ->
-                userRepository.signup(userCreated, oAuthUserRegistrationRequest.password)
+            factory.newUser(
+                oAuthUserRegistrationRequest.userId,
+                oAuthUserRegistrationRequest.email,
+                oAuthUserRegistrationRequest.name
+            ).let { newUser ->
+                userRepository.signup(newUser, oAuthUserRegistrationRequest.password)
                 log.info("new user signed up")
-                publisher.publish(UserCreatedDomainEvent(userCreated.id))
+                publisher.publish(UserCreatedDomainEvent(newUser.id))
             }
         } catch (e: Exception) {
             log.error(e.message)
             throw AuthenticationException("$ERROR_AO_REGISTRAR_NOVO_USUARIO: $oAuthUserRegistrationRequest.name")
         }
 
-    override fun signup(userRegistrationRequest: UserRegistrationRequest){
+    override fun signup(userRegistrationRequest: UserRegistrationRequest) {
         try {
-            return factory.newUser(
-                name = userRegistrationRequest.name.loginName,
-                email = userRegistrationRequest.email.value
-            ).let { userCreated ->
-                userRepository.signup(userCreated, userRegistrationRequest.password)
-                log.info("new user registered")
-                publisher.publish(UserCreatedDomainEvent(userCreated.id))
-            }
+            return factory.newUser(userRegistrationRequest.name.loginName, userRegistrationRequest.email.value)
+                .let { newUser ->
+                    userRepository.signup(newUser, userRegistrationRequest.password)
+                    log.info("new user registered")
+                    publisher.publish(UserCreatedDomainEvent(newUser.id))
+                }
         } catch (e: Exception) {
             log.error(e.message)
             throw AuthenticationException("$ERROR_AO_REGISTRAR_NOVO_USUARIO: $userRegistrationRequest.name")
