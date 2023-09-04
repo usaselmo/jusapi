@@ -27,11 +27,9 @@ class ApplicationAuthenticator(
 
     fun registerUserAccess(user: User, access: Access): User {
         try {
-            return user.registerAccess().also {
-                publisher.publish(
-                    UserAccessRegisteredDomainEvent(user = user, access = access)
-                )
-            }
+            return user.registerAccess()
+                .apply { userRepository.registerAccess(this) }
+                .also { publisher.publish(UserAccessRegisteredDomainEvent(user = user, access = access)) }
         } catch (e: Exception) {
             log.error(e.message)
             throw AuthenticationException(ERROR_AO_AUTENTICAR_USUARIO)

@@ -36,7 +36,7 @@ class ApplicationAuthenticatorTest {
     )
 
     @Test
-    fun ` when user authentication error should fire AuthenticationException `() {
+    fun ` quando usuario nao autentica deve lancar excecao `() {
         createUserWithCredit().let { user ->
             createPassword().let { password ->
                 `when`(userRepository.find(user.id, password)).thenReturn(user)
@@ -49,7 +49,7 @@ class ApplicationAuthenticatorTest {
     }
 
     @Test
-    fun ` when user authenticate should fire event `() {
+    fun ` quando usuario autentica deve disparar evento `() {
         createUserWithCredit().let { user ->
             createPassword().let { password ->
                 `when`(userRepository.find(user.id, password)).thenReturn(user)
@@ -60,7 +60,7 @@ class ApplicationAuthenticatorTest {
     }
 
     @Test
-    fun ` when user not found should throw AuthenticationException `() {
+    fun ` quando usuario nao encontrado deve lancar excecao `() {
         createUserWithCredit().let { user ->
             createPassword().let { password ->
                 `when`(userRepository.find(user.id, password)).thenReturn(null)
@@ -72,7 +72,7 @@ class ApplicationAuthenticatorTest {
     }
 
     @Test
-    fun ` when user is OK should authenticate `() {
+    fun ` quando usuario ta OK deve autenticar `() {
         createUserWithCredit().let { user ->
             createPassword().let { password ->
                 `when`(userRepository.find(user.id, password)).thenReturn(user)
@@ -85,7 +85,7 @@ class ApplicationAuthenticatorTest {
     }
 
     @Test
-    fun ` when user does not authenticate should not fire event `() {
+    fun ` quando usuario nao autenticar deve lancar excecao `() {
         createUserWithCredit().let { it ->
             createPassword().let { password ->
                 it.zeroCredits().let { user ->
@@ -113,7 +113,7 @@ class ApplicationAuthenticatorTest {
     }
 
     @Test
-    fun ` when register user access should fire event `() {
+    fun ` quando registrar acesso de usuario deve disparar evento `() {
         createUserWithCredit().let { user ->
             Access().let { access ->
                 authenticator.registerUserAccess(user, access)
@@ -123,7 +123,17 @@ class ApplicationAuthenticatorTest {
     }
 
     @Test
-    fun ` when register user access fails should Throw AuthenticationException `() {
+    fun ` quando registrar acesso de usuario deve persistir  ` (){
+        createUserWithCredit().let { user ->
+            Access().let { access ->
+                authenticator.registerUserAccess(user, access)
+                verify(userRepository, times(1)).registerAccess(user.registerAccess())
+            }
+        }
+    }
+
+    @Test
+    fun ` quando registro de usuario falhar deve lancar excecao `() {
         createUserWithCredit().let { user ->
             Access().let { access ->
                 `when`(publisher.publish(any(DomainEvent::class.java))).then { throw Exception() }
@@ -135,7 +145,7 @@ class ApplicationAuthenticatorTest {
     }
 
     @Test
-    fun ` when user has no credit should return USUARIO_NAO_TEM_CREDITOS `() {
+    fun ` quando usuario nao tem credito deve retornar USUARIO_NAO_TEM_CREDITOS `() {
         createUserWithCredit()
             .zeroCredits()
             .let { userWithNoCredit ->
@@ -151,7 +161,7 @@ class ApplicationAuthenticatorTest {
     }
 
     @Test
-    fun ` when user is deleted should return USUARIO_DELETADO `() {
+    fun ` quando usuario deletado deve retornar USUARIO_DELETADO `() {
         createUserWithCredit()
             .delete()
             .let { deletedUser ->
@@ -167,7 +177,7 @@ class ApplicationAuthenticatorTest {
     }
 
     @Test
-    fun ` when user account is deleted should return USUARIO_CONTA_DELETADA `() {
+    fun ` quando conta de usuario deletada deve retornar USUARIO_CONTA_DELETADA `() {
         createUserWithCredit()
             .deleteAccount()
             .let { userWithDeletedAccount ->
@@ -183,7 +193,7 @@ class ApplicationAuthenticatorTest {
     }
 
     @Test
-    fun ` when user account is blocked should return USUARIO_CONTA_BLOQUEADA `() {
+    fun ` quando conta de usuario bloqueada deve retornar USUARIO_CONTA_BLOQUEADA `() {
         createUserWithCredit()
             .blockAccount()
             .let { userWithBlockedAccount ->
@@ -205,7 +215,7 @@ class ApplicationAuthenticatorTest {
 
 
     @Test
-    fun ` when authetication fails should throw AuthenticationException `() {
+    fun ` quando autenticacao falha deve lancar AuthenticationException `() {
         createUserWithCredit().let { userOK ->
             createPassword().let { password ->
                 `when`(userRepository.find(userOK.email, password)).then { throw Exception() }
@@ -321,7 +331,7 @@ class ApplicationAuthenticatorTest {
     }
 
     @Test
-    fun ` quando poe credito o saldo aumenta `() {
+    fun ` quando poe credito o saldo deve aumentar `() {
         with(createUserWithCredit()) {
             val initialBalance = balance()
             assertEquals(initialBalance + 100L, increaseBalance(Credit.withDefaults(100L)).balance())

@@ -38,6 +38,11 @@ class AuthenticationUserRepository : UserRepository {
             }
     }
 
+    override fun registerAccess(user: User) {
+        //TODO
+        log.warn(" TODO")
+    }
+
     override fun signup(user: User, password: Password) {
         if (users.any { it.user.id == user.id || it.user.email == user.email }) {
             log.error("Element exists already: $user")

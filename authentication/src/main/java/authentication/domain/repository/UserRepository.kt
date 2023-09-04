@@ -11,4 +11,5 @@ interface UserRepository {
     fun find(userId: UserId): User?
     fun update(user: User)
     fun signup(user: User, password: Password)
+    fun registerAccess(user: User)
 }

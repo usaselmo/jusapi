@@ -232,15 +232,13 @@ class JusApiUserServicesTest {
     @Test
     fun ` when deleteAccount user not found should throw AuthenticationException `() {
         createUserWithCredit().let { user ->
-            user.deleteAccount().let { userAccountDeleted ->
+            user.deleteAccount().let {
 
                 `when`(mockUserRepository.find(user.id)).then { null }
 
                 assertThrows<AuthenticationException>(USUARIO_NAO_ENCONTRADO) {
                     jusApiUserServices.deleteAccount(user.id)
                 }
-
-
 
             }
         }

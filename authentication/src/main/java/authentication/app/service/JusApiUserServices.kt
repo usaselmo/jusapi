@@ -29,20 +29,19 @@ class JusApiUserServices(
     private val factory: Factory
 ) : UserServices {
 
-    override fun signup(oAuthUserRegistrationRequest: OAuthUserRegistrationRequest): User? =
+    override fun signup(oAuthUserRegistrationRequest: OAuthUserRegistrationRequest) =
         try {
             factory.newUser(oAuthUserRegistrationRequest.userId, oAuthUserRegistrationRequest.email, oAuthUserRegistrationRequest.name).let { userCreated ->
                 userRepository.signup(userCreated, oAuthUserRegistrationRequest.password)
                 log.info("new user signed up")
                 publisher.publish(UserCreatedDomainEvent(userCreated.id))
-                userCreated
             }
         } catch (e: Exception) {
             log.error(e.message)
             throw AuthenticationException("$ERROR_AO_REGISTRAR_NOVO_USUARIO: $oAuthUserRegistrationRequest.name")
         }
 
-    override fun signup(userRegistrationRequest: UserRegistrationRequest): User? {
+    override fun signup(userRegistrationRequest: UserRegistrationRequest){
         try {
             return factory.newUser(
                 name = userRegistrationRequest.name.loginName,
@@ -51,7 +50,6 @@ class JusApiUserServices(
                 userRepository.signup(userCreated, userRegistrationRequest.password)
                 log.info("new user registered")
                 publisher.publish(UserCreatedDomainEvent(userCreated.id))
-                userCreated
             }
         } catch (e: Exception) {
             log.error(e.message)
