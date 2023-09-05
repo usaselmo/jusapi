@@ -1,6 +1,6 @@
 package ui.app.config
 
-import authentication.api.OAuthUserRegistrationRequest
+import authentication.api.OAuthUserRegistrationInput
 import authentication.api.UserServices
 import core.api.model.Email
 import core.api.model.Name
@@ -58,7 +58,7 @@ class AuthenticationEvents(
                 UserId((oAuth2User.attributes["id"] as Int).toString()).let { userId ->
                     if (!userServices.exists(userId)) {
                         userServices.signup(
-                            OAuthUserRegistrationRequest(
+                            OAuthUserRegistrationInput(
                                 name = Name(
                                     fullName = oAuth2User.attributes["name"] as String,
                                     loginName = oAuth2User.attributes["login"] as String

@@ -1,6 +1,6 @@
 package authentication.app.service
 
-import authentication.api.UserRegistrationRequest
+import authentication.api.UserRegistrationInput
 import authentication.app.Factory
 import authentication.domain.AuthenticationException
 import authentication.domain.Messages
@@ -36,7 +36,7 @@ class JusApiUserServicesTest {
     fun register() {
         val user = factory.newUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
             createPassword().let { password ->
-                UserRegistrationRequest(user.name, user.email, password, Credit.withDefaults(10L)).let { urr->
+                UserRegistrationInput(user.name, user.email, password, Credit.withDefaults(10L)).let { urr->
 
                     `when`(mockFactory.newUser(anyString(), anyString(), any())).thenReturn(user)
                     doNothing().`when`(mockUserRepository).update(user)
@@ -55,7 +55,7 @@ class JusApiUserServicesTest {
     @Test
     fun ` register should throw AuthenticationException `() {
         factory.newUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
-            UserRegistrationRequest(user.name, user.email, createPassword(), Credit.withDefaults(10L)).let { urr ->
+            UserRegistrationInput(user.name, user.email, createPassword(), Credit.withDefaults(10L)).let { urr ->
                 `when`(mockFactory.newUser(anyString(), anyString(), any())).then { throw Exception("") }
                 assertThrows<AuthenticationException> { jusApiUserServices.signup(urr) }
             }
@@ -66,7 +66,7 @@ class JusApiUserServicesTest {
     fun ` register should throw AuthenticationException 2 `() {
         factory.newUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
             createPassword().let { password ->
-                UserRegistrationRequest(user.name, user.email, password, Credit.withDefaults(10L)).let { urr ->
+                UserRegistrationInput(user.name, user.email, password, Credit.withDefaults(10L)).let { urr ->
                     `when`(mockFactory.newUser(anyString(), anyString(), any())).thenReturn(user)
                     `when`(mockUserRepository.signup(user, password)).then { throw Exception() }
 
@@ -79,7 +79,7 @@ class JusApiUserServicesTest {
     @Test
     fun ` register should throw AuthenticationException 3 `() {
         factory.newUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
-            UserRegistrationRequest(user.name, user.email, createPassword(), Credit.withDefaults(10L)).let { urr ->
+            UserRegistrationInput(user.name, user.email, createPassword(), Credit.withDefaults(10L)).let { urr ->
                 `when`(mockFactory.newUser(anyString(), anyString(), any())).thenReturn(user)
                 doNothing().`when`(mockUserRepository).update(user)
                 `when`(mockPublisher.publish(any(UserCreatedDomainEvent::class.java))).then { throw Exception() }

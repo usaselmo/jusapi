@@ -39,8 +39,7 @@ class AuthenticationUserRepository : UserRepository {
     }
 
     override fun registerAccess(user: User) {
-        //TODO
-        log.warn(" TODO")
+        update(user)
     }
 
     override fun signup(user: User, password: Password) {

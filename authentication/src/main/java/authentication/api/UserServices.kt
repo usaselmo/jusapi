@@ -4,8 +4,8 @@ import core.api.model.*
 
 interface UserServices {
 
-    fun signup(userRegistrationRequest: UserRegistrationRequest)
-    fun signup(oAuthUserRegistrationRequest: OAuthUserRegistrationRequest)
+    fun signup(userRegistrationInput: UserRegistrationInput)
+    fun signup(oAuthUserRegistrationInput: OAuthUserRegistrationInput)
     fun increaseBalance(userId: UserId, credit: Credit)
     fun delete(userId: UserId)
     fun block(userId: UserId)
@@ -16,14 +16,14 @@ interface UserServices {
 
 }
 
-data class UserRegistrationRequest(
+data class UserRegistrationInput(
     val name: Name,
     val email: Email,
     val password: Password,
     val initialCredit: Credit
 )
 
-data class OAuthUserRegistrationRequest(
+data class OAuthUserRegistrationInput(
     val name: Name,
     val email: Email,
     val userId: UserId,
