@@ -4,11 +4,11 @@ import core.api.email.Attachment
 import core.api.email.Body
 import core.api.email.EmailSender
 import core.api.email.To
+import org.springframework.stereotype.Component
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import javax.inject.Named
 
-@Named
+@Component
 class JusApiEmailSender : EmailSender {
 
     private val service: ExecutorService = Executors.newFixedThreadPool(8)

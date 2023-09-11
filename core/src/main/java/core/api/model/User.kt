@@ -6,6 +6,12 @@ data class UserId(
     val value: String,
 )
 
+enum class Role {
+    ADMIN, FINANCIAL_ADMIN,
+    USER, FINANCIAL_USER,
+    GUEST
+}
+
 data class User(
     val id: UserId,
     val name: Name,
@@ -13,6 +19,7 @@ data class User(
     val createdAt: LocalDateTime,
     private val account: Account,
     val isDeleted: Boolean,
+    private val roles: MutableSet<Role>
 ) {
 
     fun delete(): User =
@@ -46,8 +53,19 @@ data class User(
         return copy(account = account.setInitialCredit())
     }
 
-    fun zeroCredits(): User =
-        copy(account = account.zeroCredits())
+    fun removeAllCredits(): User =
+        copy(account = account.removeAllCredits())
+
+    fun addRole(role: Role): User {
+        roles.add(role)
+        return this;
+    }
+
+    fun roles(): List<Role> =
+        listOf(*roles.toTypedArray())
+
+    fun hasRole(role: Role) : Boolean =
+        roles.contains(role)
 
 }
 
@@ -72,10 +90,10 @@ data class Account(
     fun setInitialCredit(): Account =
         copy(usage = usage.copy(credit = type.initialCredit))
 
-    fun zeroCredits(): Account =
+    fun removeAllCredits() =
         copy(usage = usage.copy(credit = 0L))
 
-    fun delete() : Account =
+    fun delete(): Account =
         copy(isDeleted = true, isBlocked = true)
 }
 
@@ -101,8 +119,8 @@ data class Credit(
     val expires: Boolean
 ) {
     companion object {
-        fun withDefaults(amount: Long)=
-            Credit(value = Money(amount,0L), expires = false)
+        fun withDefaults(amount: Long) =
+            Credit(value = Money(amount, 0L), expires = false)
     }
 }
 

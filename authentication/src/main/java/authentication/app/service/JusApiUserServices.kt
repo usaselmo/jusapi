@@ -16,6 +16,8 @@ import authentication.domain.repository.UserRepository
 import core.api.event.Publisher
 import core.api.event.UserCreatedDomainEvent
 import core.api.model.Credit
+import core.api.model.Role
+import core.api.model.Role.FINANCIAL_USER
 import core.api.model.User
 import core.api.model.UserId
 import org.apache.commons.logging.Log
@@ -31,7 +33,7 @@ class JusApiUserServices(
 
     override fun signup(oAuthUserRegistrationInput: OAuthUserRegistrationInput) =
         try {
-            factory.newUser(
+            factory.newStandardUser(
                 oAuthUserRegistrationInput.userId,
                 oAuthUserRegistrationInput.email,
                 oAuthUserRegistrationInput.name
@@ -47,12 +49,9 @@ class JusApiUserServices(
 
     override fun signup(userRegistrationInput: UserRegistrationInput) {
         try {
-            return factory.newUser(userRegistrationInput.name.loginName, userRegistrationInput.email.value)
-                .let { newUser ->
-                    userRepository.signup(newUser, userRegistrationInput.password)
-                    log.info("new user registered")
-                    publisher.publish(UserCreatedDomainEvent(newUser.id))
-                }
+            val newStandardUser = factory.newStandardUser(userRegistrationInput.name.loginName, userRegistrationInput.email.value)
+            userRepository.signup(newStandardUser, userRegistrationInput.password)
+            publisher.publish(UserCreatedDomainEvent(newStandardUser.id))
         } catch (e: Exception) {
             log.error(e.message)
             throw AuthenticationException("$ERROR_AO_REGISTRAR_NOVO_USUARIO: $userRegistrationInput.name")

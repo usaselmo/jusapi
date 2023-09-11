@@ -13,13 +13,15 @@ import authentication.impl.any
 import authentication.impl.createPassword
 import authentication.impl.createRandomEmail
 import authentication.impl.createUserWithCredit
-import core.api.model.Credit
 import core.api.event.Publisher
 import core.api.event.UserCreatedDomainEvent
+import core.api.model.Credit
+import core.api.model.Role.USER
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.*
 import java.util.*
+import kotlin.test.assertTrue
 
 @Suppress("UNCHECKED_CAST")
 class JusApiUserServicesTest {
@@ -34,17 +36,17 @@ class JusApiUserServicesTest {
 
     @Test
     fun register() {
-        val user = factory.newUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
+        factory.newStandardUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
             createPassword().let { password ->
-                UserRegistrationInput(user.name, user.email, password, Credit.withDefaults(10L)).let { urr->
+                UserRegistrationInput(user.name, user.email, password, Credit.withDefaults(10L)).let { urr ->
 
-                    `when`(mockFactory.newUser(anyString(), anyString(), any())).thenReturn(user)
+                    `when`(mockFactory.newStandardUser(anyString(), anyString(), any())).thenReturn(user)
                     doNothing().`when`(mockUserRepository).update(user)
                     doNothing().`when`(mockPublisher).publish(any(UserCreatedDomainEvent::class.java))
 
                     jusApiUserServices.signup(urr)
 
-                    verify(mockFactory, times(1)).newUser(anyString(), anyString(), any())
+                    verify(mockFactory, times(1)).newStandardUser(anyString(), anyString(), any())
                     verify(mockUserRepository, times(1)).signup(user, password)
                     verify(mockPublisher, times(1)).publish(any(UserCreatedDomainEvent::class.java))
                 }
@@ -54,9 +56,9 @@ class JusApiUserServicesTest {
 
     @Test
     fun ` register should throw AuthenticationException `() {
-        factory.newUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
+        factory.newStandardUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
             UserRegistrationInput(user.name, user.email, createPassword(), Credit.withDefaults(10L)).let { urr ->
-                `when`(mockFactory.newUser(anyString(), anyString(), any())).then { throw Exception("") }
+                `when`(mockFactory.newStandardUser(anyString(), anyString(), any())).then { throw Exception("") }
                 assertThrows<AuthenticationException> { jusApiUserServices.signup(urr) }
             }
         }
@@ -64,10 +66,10 @@ class JusApiUserServicesTest {
 
     @Test
     fun ` register should throw AuthenticationException 2 `() {
-        factory.newUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
+        factory.newStandardUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
             createPassword().let { password ->
                 UserRegistrationInput(user.name, user.email, password, Credit.withDefaults(10L)).let { urr ->
-                    `when`(mockFactory.newUser(anyString(), anyString(), any())).thenReturn(user)
+                    `when`(mockFactory.newStandardUser(anyString(), anyString(), any())).thenReturn(user)
                     `when`(mockUserRepository.signup(user, password)).then { throw Exception() }
 
                     assertThrows<AuthenticationException> { jusApiUserServices.signup(urr) }
@@ -78,9 +80,9 @@ class JusApiUserServicesTest {
 
     @Test
     fun ` register should throw AuthenticationException 3 `() {
-        factory.newUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
+        factory.newStandardUser(UUID.randomUUID().toString(), createRandomEmail()).let { user ->
             UserRegistrationInput(user.name, user.email, createPassword(), Credit.withDefaults(10L)).let { urr ->
-                `when`(mockFactory.newUser(anyString(), anyString(), any())).thenReturn(user)
+                `when`(mockFactory.newStandardUser(anyString(), anyString(), any())).thenReturn(user)
                 doNothing().`when`(mockUserRepository).update(user)
                 `when`(mockPublisher.publish(any(UserCreatedDomainEvent::class.java))).then { throw Exception() }
 
@@ -90,10 +92,21 @@ class JusApiUserServicesTest {
     }
 
     @Test
+    fun ` factory should create standard user with USER role `() {
+        val newStandardUser = factory.newStandardUser(
+            UUID.randomUUID().toString(),
+            "test@gmail.com"
+        )
+
+        assertTrue { newStandardUser.roles().size == 1 }
+        assertTrue { newStandardUser.hasRole(USER) }
+    }
+
+    @Test
     fun increaseBalance() {
         Credit.withDefaults(10L).let { credit ->
             createUserWithCredit()
-                .zeroCredits().let { user ->
+                .removeAllCredits().let { user ->
                     `when`(mockUserRepository.find(user.id)).thenReturn(user)
 
                     jusApiUserServices.increaseBalance(user.id, credit)
@@ -110,7 +123,7 @@ class JusApiUserServicesTest {
     fun ` increaseBalance should throw AuthenticationException `() {
         Credit.withDefaults(10L).let { credit ->
             createUserWithCredit()
-                .zeroCredits().let { user ->
+                .removeAllCredits().let { user ->
                     `when`(mockUserRepository.find(user.id)).then { throw Exception() }
 
                     assertThrows<AuthenticationException>(Messages.ERROR_AO_AUMENTAR_CREDITO_DE_USUARIO) {
@@ -124,7 +137,7 @@ class JusApiUserServicesTest {
     fun ` increase balance should throw AuthenticationException ERROR_USER_NOT_FOUND `() {
         Credit.withDefaults(10L).let { credit ->
             createUserWithCredit()
-                .zeroCredits().let { user ->
+                .removeAllCredits().let { user ->
                     `when`(mockUserRepository.find(user.id)).then { null }
 
                     assertThrows<AuthenticationException>(USUARIO_NAO_ENCONTRADO) {
@@ -247,7 +260,7 @@ class JusApiUserServicesTest {
     @Test
     fun ` when deleteAccount fails should throw AuthenticationException `() {
         createUserWithCredit().let { user ->
-            user.deleteAccount().let { userAccountDeleted ->
+            user.deleteAccount().let {
 
                 `when`(mockUserRepository.find(user.id)).then { throw Exception() }
 

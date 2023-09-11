@@ -3,6 +3,7 @@ open module jusapi.ui {
     requires kotlin.reflect;
     requires spring.jcl;
     requires spring.context;
+    requires javax.inject;
 
     requires jusapi.core;
 

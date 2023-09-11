@@ -88,7 +88,7 @@ class ApplicationAuthenticatorTest {
     fun ` quando usuario nao autenticar deve lancar excecao `() {
         createUserWithCredit().let { it ->
             createPassword().let { password ->
-                it.zeroCredits().let { user ->
+                it.removeAllCredits().let { user ->
                     `when`(userRepository.find(user.id, password)).thenReturn(user)
                     authenticator.authenticate(user.id, password)
                     verify(publisher, times(0)).publish(any(UserAuthenticatedDomainEvent::class.java))
@@ -147,7 +147,7 @@ class ApplicationAuthenticatorTest {
     @Test
     fun ` quando usuario nao tem credito deve retornar USUARIO_NAO_TEM_CREDITOS `() {
         createUserWithCredit()
-            .zeroCredits()
+            .removeAllCredits()
             .let { userWithNoCredit ->
                 createPassword().let { password ->
                     `when`(userRepository.find(userWithNoCredit.id, password)).thenReturn(userWithNoCredit)
@@ -297,7 +297,7 @@ class ApplicationAuthenticatorTest {
     @Test
     fun ` quando usuario conta sem credito nao deve autenticar `() {
         with(createUserWithCredit()) {
-            zeroCredits().let { user ->
+            removeAllCredits().let { user ->
                 createPassword().let { password ->
                     `when`(userRepository.find(user.email, password)).thenReturn(user)
                     authenticator.authenticate(user.email, password).let { authentication ->
@@ -313,7 +313,7 @@ class ApplicationAuthenticatorTest {
     fun ` quando usuario renovar credito deve autenticar `() {
         with(createUserWithCredit()) {
             val password = createPassword()
-            zeroCredits().let { user ->
+            removeAllCredits().let { user ->
                 `when`(userRepository.find(user.email, password)).thenReturn(user)
                 authenticator.authenticate(user.email, password).let { authentication ->
                     assertFalse { authentication.isAuthenticated }
@@ -335,7 +335,7 @@ class ApplicationAuthenticatorTest {
         with(createUserWithCredit()) {
             val initialBalance = balance()
             assertEquals(initialBalance + 100L, increaseBalance(Credit.withDefaults(100L)).balance())
-            assertEquals(0L, zeroCredits().balance())
+            assertEquals(0L, removeAllCredits().balance())
         }
     }
 
@@ -355,7 +355,7 @@ class ApplicationAuthenticatorTest {
     @Test
     fun ` quando usa todo o credito o saldo zera `() {
         with(createUserWithCredit()) {
-            val balance = zeroCredits()
+            val balance = removeAllCredits()
                 .increaseBalance(Credit.withDefaults(5L))
                 .registerAccess() // 1
                 .registerAccess() // 2
@@ -369,7 +369,7 @@ class ApplicationAuthenticatorTest {
 
     @Test
     fun ` deve definir credito inicial `() {
-        factory.newUser(
+        factory.newStandardUser(
             name = UUID.randomUUID().toString(),
             email = createRandomEmail()
         ) {
@@ -377,7 +377,7 @@ class ApplicationAuthenticatorTest {
         }.let {
             assertEquals(AccountType.STANDARD.initialCredit, it.balance())
         }
-        factory.newUser(
+        factory.newStandardUser(
             name = UUID.randomUUID().toString(),
             email = createRandomEmail(),
         ).let {
@@ -387,7 +387,7 @@ class ApplicationAuthenticatorTest {
 
     @Test
     fun ` credito inicial deve ser zero`() {
-        factory.newUser(
+        factory.newStandardUser(
             name = UUID.randomUUID().toString(),
             email = createRandomEmail()
         ).let {
@@ -407,7 +407,7 @@ class ApplicationAuthenticatorTest {
 
 fun <T> any(type: Class<T>): T = Mockito.any<T>(type)
 
-fun createUserWithCredit(): User = factory.newUser(
+fun createUserWithCredit(): User = factory.newStandardUser(
     name = UUID.randomUUID().toString(),
     email = createRandomEmail()
 ) {

@@ -3,10 +3,10 @@ package core.impl
 import core.api.event.DomainEvent
 import core.api.event.Publisher
 import core.api.event.Subscriber
-import javax.inject.Named
+import org.springframework.stereotype.Component
 
 @Suppress("UNCHECKED_CAST")
-@Named
+@Component
 class JusApiPublisher<T : DomainEvent, S : Subscriber<T>> : Publisher {
 
     private val subscribers = linkedMapOf<String, MutableSet<S>>()
@@ -24,7 +24,7 @@ class JusApiPublisher<T : DomainEvent, S : Subscriber<T>> : Publisher {
         }
     }
 
-    override fun <T2 : DomainEvent, S2 : Subscriber<T2>> subscribe(key: Class<T2>, subscriber: S2) {
+    override fun <T3 : DomainEvent, S3 : Subscriber<T3>> subscribe(key: Class<T3>, subscriber: S3) {
         try {
             synchronized(this) {
                 subscribers[key.name]?.add(subscriber as S) ?: run {
