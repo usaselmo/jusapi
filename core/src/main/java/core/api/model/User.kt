@@ -84,7 +84,7 @@ data class Account(
         usage.credit - usage.count
 
     fun incrementAccessCount(): Account {
-        return copy(usage = usage.copy(count = usage.count + 1))
+        return copy(usage = usage.incrementAccessCount())
     }
 
     fun setInitialCredit(): Account =
@@ -109,7 +109,10 @@ enum class AccountType(val initialCredit: Long) {
 data class Usage(
     val count: Long,
     val credit: Long,
-)
+) {
+    fun incrementAccessCount(): Usage =
+        copy(count = count + 1)
+}
 
 class Access {
 }
